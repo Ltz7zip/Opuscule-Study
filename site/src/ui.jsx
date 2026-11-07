@@ -1695,6 +1695,30 @@ export function ActivityTerrain({
   );
 }
 
+/** Page-level empty state: two nodes and a hairline, then a way out. */
+export function EmptyState({ title, text, btn, onGo }) {
+  return (
+    <div className="empty">
+      <div className="empty-art" aria-hidden="true">
+        <motion.span
+          className="empty-node"
+          animate={{ y: [0, -7, 0] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <span className="empty-line" />
+        <motion.span
+          className="empty-node ghost"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
+      <h2>{title}</h2>
+      <p>{text}</p>
+      <button className="btn btn-primary" onClick={onGo}>{btn}</button>
+    </div>
+  );
+}
+
 export function useScrollLock(locked) {
   useEffect(() => {
     if (!locked) return;

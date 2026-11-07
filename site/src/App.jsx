@@ -89,16 +89,19 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const onRoute = () => {
+    const settle = () => {
       setRoute(parseRoute());
       setConceptId(null);
-      window.scrollTo(0, 0);
     };
-    window.addEventListener('popstate', onRoute);
-    window.addEventListener('opus:route', onRoute);
+    // Forward navigations start at the top; back/forward keep the offset the
+    // browser remembered for that history entry.
+    const onPush = () => { settle(); window.scrollTo(0, 0); };
+    const onPop = () => settle();
+    window.addEventListener('popstate', onPop);
+    window.addEventListener('opus:route', onPush);
     return () => {
-      window.removeEventListener('popstate', onRoute);
-      window.removeEventListener('opus:route', onRoute);
+      window.removeEventListener('popstate', onPop);
+      window.removeEventListener('opus:route', onPush);
     };
   }, []);
 
@@ -177,7 +180,28 @@ export default function App() {
     navigateTo(full);
   }, [lang]);
 
-  const openConcept = useCallback((id) => setConceptId(id), []);
+  // Keep in-app links on the client: full reloads would cut every transition.
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (!(e.target instanceof Element)) return;
+      const a = e.target.closest('a[href]');
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const raw = a.getAttribute('href');
+      if (!raw || raw.startsWith('#') || /^[a-z]+:/i.test(raw)) return;
+      if (a.origin !== window.location.origin) return;
+      e.preventDefault();
+      navigate(`${a.pathname}${a.search}${a.hash}`);
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [navigate]);
+
+  /* The sheet is a fixed-height rail, so scaling it out of a chip distorted it.
+     It now simply glides in from the right, content and all. */
+  const openConcept = useCallback((id) => {
+    setConceptId(id);
+  }, []);
   const closeConcept = useCallback(() => setConceptId(null), []);
 
   const toggleLang = useCallback(() => {
@@ -346,7 +370,7 @@ function ScrollProgress() {
 }
 
 const NAV = [
-  { key: 'home', path: '/', id: 'nav.library' },
+  { key: 'home', path: '/', id: 'nav.home' },
   { key: 'catalog', path: '/catalog', id: 'nav.catalog' },
   { key: 'path', path: '/path/dl/mastery', id: 'nav.path' },
   { key: 'map', path: '/map', id: 'nav.map' },
@@ -458,7 +482,7 @@ function MobileBar() {
   const { t, setPaletteOpen, route, lang, href } = useApp();
   const active = route.name === 'read' ? 'path' : route.name;
   const items = [
-    { key: 'home', path: '/', label: t('nav.library'), icon: 'M2 7.5 8 2l6 5.5V14H2Z' },
+    { key: 'home', path: '/', label: t('nav.home'), icon: 'M2 7.5 8 2l6 5.5V14H2Z' },
     { key: 'catalog', path: '/catalog', label: t('nav.catalog'), icon: 'M2 2h12v3H2zM2 7h12v3H2zM2 12h12v2H2z' },
     { key: 'map', path: '/map', label: t('nav.map'), icon: 'M2 4l4-2 4 2 4-2v10l-4 2-4-2-4 2Z' },
     { key: 'review', path: '/review', label: t('nav.review'), icon: 'M3 8a5 5 0 1 0 1.6-3.7M3 2v3h3' }
@@ -563,6 +587,7 @@ function ConceptSheet({ id, onClose }) {
   const { lang, t, navigate, openConcept, catalog } = useApp();
   const c = id ? catalog.concepts[id] : null;
   const sheetRef = useRef(null);
+  const reduce = useReducedMotion();
   useScrollLock(!!id);
 
   useEffect(() => {
@@ -582,7 +607,7 @@ function ConceptSheet({ id, onClose }) {
           <motion.div
             className="sheet-back"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.26 }}
             onClick={onClose}
           />
           <motion.aside
@@ -590,10 +615,17 @@ function ConceptSheet({ id, onClose }) {
             tabIndex={-1}
             className="sheet"
             role="dialog" aria-modal="true" aria-label={lang === 'zh' ? c.zh : c.en}
-            initial={{ x: 40, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 30, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            /* The panel is solid, so it only glides: fading it as well made the
+               opaque sheet blink for one frame as the tween handed back. The
+               scrim underneath still fades, which reads as the fade-in. */
+            initial={reduce ? { x: 0 } : { x: 44 }}
+            animate={{ x: 0 }}
+            exit={reduce
+              ? { opacity: 0, transition: { duration: 0.2 } }
+              : { opacity: 0, x: 44, transition: { duration: 0.26, ease: [0.4, 0, 1, 1] } }}
+            transition={reduce
+              ? { duration: 0.2 }
+              : { duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
           >
             <div className="sheet-top">
               <span className={`field-tag ${c.field}`}>{c.field === 'math' ? t('map.legend.math') : c.field === 'ai' ? t('map.legend.ai') : t('map.legend.cs')}</span>
@@ -606,59 +638,55 @@ function ConceptSheet({ id, onClose }) {
 
             <motion.div
               className="sheet-body"
-              initial="hidden" animate="show"
-              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.055, delayChildren: 0.06 } } }}
+              /* One block, one motion: the heading and the body copy travel with
+                 the panel instead of arriving as separate beats. */
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduce
+                ? { duration: 0.2 }
+                : { duration: 0.42, ease: [0.4, 0, 0.2, 1], delay: 0.04 }}
             >
-              {[
-                <h2 key="title">{lang === 'zh' ? c.zh : c.en}</h2>,
-                <div className="sheet-sub" key="sub">{lang === 'zh' ? c.en : c.zh}</div>,
-                <p className="sheet-def" key="def">{lang === 'zh' ? c.def : c.defEn}</p>,
-                <div className="sheet-block" key="pre">
-                  <div className="mini-kick">{lang === 'zh' ? '前置' : 'Prerequisites'}</div>
-                  {c.pre.length ? (
-                    <ul className="sheet-list">
-                      {c.pre.map((p) => (
-                        <li key={p}>
-                          <button onClick={() => openConcept(p)}>
-                            {lang === 'zh' ? catalog.concepts[p]?.zh : catalog.concepts[p]?.en}
-                            <span aria-hidden="true">↗</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : <p className="sheet-none">{lang === 'zh' ? '根节点，没有前置。' : 'A root node. Nothing before it.'}</p>}
-                </div>,
-                <div className="sheet-block" key="used">
-                  <div className="mini-kick">{lang === 'zh' ? '被用于' : 'Leads to'}</div>
-                  {c.usedBy.length ? (
-                    <ul className="sheet-list">
-                      {c.usedBy.map((p) => (
-                        <li key={p}>
-                          <button onClick={() => openConcept(p)}>
-                            {lang === 'zh' ? catalog.concepts[p]?.zh : catalog.concepts[p]?.en}
-                            <span aria-hidden="true">↗</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : <p className="sheet-none">{lang === 'zh' ? '这是一个终点。' : 'This is an endpoint.'}</p>}
-                </div>,
-                <div className="sheet-actions" key="actions">
-                  <button className="btn btn-primary" onClick={() => { onClose(); navigate('/map'); }}>
-                    {lang === 'zh' ? '在知识图中查看' : 'Open in graph'}
-                  </button>
-                  <button className="btn btn-ghost" onClick={() => { onClose(); navigate(`/path/${catalog.subjects[0]?.slug || 'dl'}/mastery`); }}>
-                    {lang === 'zh' ? '看所属路线' : 'See the route'}
-                  </button>
-                </div>
-              ].map((el, i) => (
-                <motion.div
-                  key={i}
-                  variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } } }}
-                >
-                  {el}
-                </motion.div>
-              ))}
+              <h2>{lang === 'zh' ? c.zh : c.en}</h2>
+              <div className="sheet-sub">{lang === 'zh' ? c.en : c.zh}</div>
+              <p className="sheet-def">{lang === 'zh' ? c.def : c.defEn}</p>
+              <div className="sheet-block">
+                <div className="mini-kick">{lang === 'zh' ? '前置' : 'Prerequisites'}</div>
+                {c.pre.length ? (
+                  <ul className="sheet-list">
+                    {c.pre.map((p) => (
+                      <li key={p}>
+                        <button onClick={() => openConcept(p)}>
+                          {lang === 'zh' ? catalog.concepts[p]?.zh : catalog.concepts[p]?.en}
+                          <span aria-hidden="true">↗</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : <p className="sheet-none">{lang === 'zh' ? '根节点，没有前置。' : 'A root node. Nothing before it.'}</p>}
+              </div>
+              <div className="sheet-block">
+                <div className="mini-kick">{lang === 'zh' ? '被用于' : 'Leads to'}</div>
+                {c.usedBy.length ? (
+                  <ul className="sheet-list">
+                    {c.usedBy.map((p) => (
+                      <li key={p}>
+                        <button onClick={() => openConcept(p)}>
+                          {lang === 'zh' ? catalog.concepts[p]?.zh : catalog.concepts[p]?.en}
+                          <span aria-hidden="true">↗</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : <p className="sheet-none">{lang === 'zh' ? '这是一个终点。' : 'This is an endpoint.'}</p>}
+              </div>
+              <div className="sheet-actions">
+                <button className="btn btn-primary" onClick={() => { onClose(); navigate('/map'); }}>
+                  {lang === 'zh' ? '在知识图中查看' : 'Open in graph'}
+                </button>
+                <button className="btn btn-ghost" onClick={() => { onClose(); navigate(`/path/${catalog.subjects[0]?.slug || 'dl'}/mastery`); }}>
+                  {lang === 'zh' ? '看所属路线' : 'See the route'}
+                </button>
+              </div>
             </motion.div>
           </motion.aside>
         </div>
@@ -678,7 +706,7 @@ function CommandPalette({ open, onClose }) {
 
   const items = useMemo(() => {
     const pages = [
-      { type: 'page', zh: '书库首页', en: 'Library home', sub: 'Home', path: '/' },
+      { type: 'page', zh: '首页', en: 'Home', sub: 'Home', path: '/' },
       { type: 'page', zh: '科目目录', en: 'Catalogue', sub: 'Catalogue', path: '/catalog' },
       { type: 'page', zh: '知识图', en: 'Knowledge graph', sub: 'Map', path: '/map' },
       { type: 'page', zh: '复习', en: 'Review', sub: 'Review', path: '/review' }

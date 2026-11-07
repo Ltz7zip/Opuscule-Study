@@ -2,8 +2,9 @@ import React, { useMemo, useRef } from 'react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useApp } from '../App';
 import { MODES } from '../data';
-import { ActivityTerrain, EASE, Reveal, Ring, SplitLine } from '../ui';
+import { ActivityTerrain, EASE, EmptyState, Reveal, Ring, SplitLine } from '../ui';
 import { readSet } from '../progress';
+import { armTitleFlight } from '../flight';
 
 const MODE_KEYS = ['mastery', 'applied', 'literacy'];
 
@@ -85,7 +86,7 @@ export default function PathPage({ subjectId, mode }) {
     <div className="path-page">
       <div className="wrap">
         <div className="crumb">
-          <a href={href('/')}>← {t('nav.library')}</a>
+          <a href={href('/')}>← {t('nav.home')}</a>
           <span>/</span>
           <span>{subject ? (lang === 'zh' ? subject.zh : subject.en) : t('path.kick')}</span>
         </div>
@@ -93,7 +94,7 @@ export default function PathPage({ subjectId, mode }) {
         <header className="path-head">
           <div className="path-head-main">
             <div className="page-kick">{t('path.kick')}</div>
-            <h1 className="page-title path-title">
+            <h1 className="page-title path-title" data-flight-target>
               <SplitLine>{subject ? (lang === 'zh' ? subject.zh : subject.en) : t('path.kick')}</SplitLine>
               <span className="path-title-mode">{lang === 'zh' ? m.zh : m.en}</span>
             </h1>
@@ -141,7 +142,6 @@ export default function PathPage({ subjectId, mode }) {
         <div className="wrap">
           <EmptyState
             onGo={() => navigate(`/path/${fallback?.slug || 'dl'}/${fallback?.modes[0] || 'mastery'}`)}
-            lang={lang}
             title={t('path.empty.title')}
             text={t('path.empty.text')}
             btn={t('path.empty.btn')}
@@ -195,7 +195,10 @@ export default function PathPage({ subjectId, mode }) {
                         <button
                           className="u-title"
                           data-cursor="read"
-                          onClick={() => navigate(u.path)}
+                          onClick={(e) => {
+                            armTitleFlight(e.currentTarget, lang === 'zh' ? u.zh : u.en);
+                            navigate(u.path);
+                          }}
                         >
                           {lang === 'zh' ? u.zh : u.en}
                           {u.status === 'current' && (
@@ -248,7 +251,15 @@ export default function PathPage({ subjectId, mode }) {
                 </div>
               </div>
               <div className="rail-bar"><motion.i initial={{ scaleX: 0 }} whileInView={{ scaleX: progress / 100 }} viewport={{ once: true }} transition={{ duration: 1.2, ease: EASE, delay: 0.2 }} /></div>
-              <p className="rail-note">{t('path.progress.text')}</p>
+              <p className="rail-note">
+                {doneCount === 0
+                  ? (lang === 'zh' ? '还没有读过的讲次，从第 1 讲开始。' : 'Nothing read yet — start with lecture 1.')
+                  : doneCount >= units.length
+                    ? (lang === 'zh' ? `全 ${units.length} 讲已读完。` : `All ${units.length} lectures read.`)
+                    : (lang === 'zh'
+                      ? `已完成 ${doneCount} 讲，接着读第 ${doneCount + 1} 讲。`
+                      : `${doneCount} lectures done, next up lecture ${doneCount + 1}.`)}
+              </p>
               <div className="rail-stats">
                 <span><b>{units.length}</b>{t('path.summary')}</span>
                 <span><b>{conceptIds.length}</b>{t('path.concepts')}</span>
@@ -318,25 +329,4 @@ export default function PathPage({ subjectId, mode }) {
   );
 }
 
-function EmptyState({ lang, title, text, btn, onGo }) {
-  return (
-    <div className="empty">
-      <div className="empty-art" aria-hidden="true">
-        <motion.span
-          className="empty-node"
-          animate={{ y: [0, -7, 0] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <span className="empty-line" />
-        <motion.span
-          className="empty-node ghost"
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
-      <h2>{title}</h2>
-      <p>{text}</p>
-      <button className="btn btn-primary" onClick={onGo}>{btn}</button>
-    </div>
-  );
-}
+

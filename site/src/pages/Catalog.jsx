@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useApp } from '../App';
-import { Reveal, SplitLine } from '../ui';
+import { EmptyState, Reveal, RollingNumber, SplitLine } from '../ui';
+import { armTitleFlight } from '../flight';
 
 const FILTERS = [
   { key: 'all', zh: '全部', en: 'All' },
@@ -102,7 +104,14 @@ export default function Catalog() {
               className={`seg-btn ${filter === f.key ? 'on' : ''}`}
               onClick={() => setFilter(f.key)}
             >
-              {lang === 'zh' ? f.zh : f.en}
+              {filter === f.key && (
+                <motion.span
+                  className="seg-pill"
+                  layoutId="cat-seg-pill"
+                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                />
+              )}
+              <span className="seg-label">{lang === 'zh' ? f.zh : f.en}</span>
             </button>
           ))}
         </div>
@@ -128,21 +137,32 @@ export default function Catalog() {
         </div>
       </div>
 
-      <div className="cat-result">
-        {lang === 'zh' ? `匹配 ${rows.length} 门` : `${rows.length} subjects`}
+      <div className="cat-result" aria-live="polite">
+        {lang === 'zh' ? '匹配 ' : ''}
+        <RollingNumber value={rows.length} />
+        {lang === 'zh' ? ' 门' : ' subjects'}
       </div>
 
       {rows.length === 0 ? (
-        <div className="cat-empty">
-          {lang === 'zh' ? '没有匹配的科目，换个关键词试试。' : 'No subjects match. Try another keyword.'}
-        </div>
+        <EmptyState
+          title={lang === 'zh' ? '没有匹配的科目' : 'No subjects match'}
+          text={lang === 'zh'
+            ? `换个关键词，或清空筛选，回到全部 ${catalog.subjects.length} 门。`
+            : `Try another keyword, or clear the filters to see all ${catalog.subjects.length} subjects.`}
+          btn={lang === 'zh' ? '清空筛选' : 'Clear filters'}
+          onGo={() => { setQ(''); setFilter('all'); setTag('all'); }}
+        />
       ) : (
-        <div className="cat-grid">
+        <motion.div className="cat-grid" layout transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}>
           {rows.map((s, i) => {
             const open = s.lessons > 0;
             const first = s.unitList?.flatMap((u) => u.lessons)[0];
+            const flyTo = (e) => armTitleFlight(
+              e.currentTarget.closest('.cat-card')?.querySelector('.cat-name'),
+              lang === 'zh' ? s.zh : s.en
+            );
             return (
-              <Reveal key={s.slug} delay={Math.min(i, 18) * 0.012} y={12}>
+              <Reveal key={s.slug} layout delay={Math.min(i, 18) * 0.012} y={12}>
                 <article className={`cat-card ${open ? 'is-live' : ''}`}>
                   <div className="cat-card-top">
                     <span className="cat-code">{s.code}</span>
@@ -167,11 +187,18 @@ export default function Catalog() {
                     <span><b>{s.concepts}</b> {lang === 'zh' ? '概念' : 'concepts'}</span>
                   </div>
                   <div className="cat-actions">
-                    <button type="button" data-cursor="open" onClick={() => navigate(`/path/${s.slug}/${s.modes[0] || 'mastery'}`)}>
+                    <button
+                      type="button"
+                      data-cursor="open"
+                      onClick={(e) => {
+                        flyTo(e);
+                        navigate(`/path/${s.slug}/${s.modes[0] || 'mastery'}`);
+                      }}
+                    >
                       {lang === 'zh' ? '看路线' : 'Route'}
                     </button>
                     {first && (
-                      <a href={href(first.path)} data-cursor="read">
+                      <a href={href(first.path)} data-cursor="read" onClick={flyTo}>
                         {lang === 'zh' ? '读第一讲' : 'Read lesson 1'}
                       </a>
                     )}
@@ -180,7 +207,7 @@ export default function Catalog() {
               </Reveal>
             );
           })}
-        </div>
+        </motion.div>
       )}
     </div>
   );

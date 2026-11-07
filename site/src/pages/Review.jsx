@@ -65,7 +65,7 @@ function readLessons(catalog, done) {
 }
 
 export default function Review() {
-  const { lang, t, showToast, catalog, learning, setAccountOpen } = useApp();
+  const { lang, t, showToast, catalog, learning, setAccountOpen, navigate } = useApp();
   const [session, setSession] = useState(null);
   const [size, setSize] = useState(5);
 
@@ -83,6 +83,7 @@ export default function Review() {
     );
   }
 
+  const empty = rows.length === 0;
   const due = rows.filter((r) => r.overdue).length;
   const reviewed = rows.filter((r) => r.state !== 'new');
   const avg = reviewed.length
@@ -134,11 +135,13 @@ export default function Review() {
               <Ring value={due ? Math.min(100, (due / rows.length) * 100) : 0} size={96} stroke={1.5} label={`${due}/${rows.length}`} />
               <div>
                 <b>{lang === 'zh' ? '张卡到期' : 'cards due'}</b>
-                <span>{lang === 'zh' ? `大约 ${Math.max(1, Math.round(due * 0.7))} 分钟` : `about ${Math.max(1, Math.round(due * 0.7))} minutes`}</span>
+                <span>{due
+                  ? (lang === 'zh' ? `大约 ${Math.max(1, Math.round(due * 0.7))} 分钟` : `about ${Math.max(1, Math.round(due * 0.7))} minutes`)
+                  : (lang === 'zh' ? '暂无到期卡片' : 'Nothing due yet')}</span>
               </div>
             </div>
-            <button className="btn btn-primary btn-arrow today-btn" onClick={() => setSession(0)}>
-              {t('review.card.btn')}
+            <button className="btn btn-primary btn-arrow today-btn" onClick={() => setSession(0)} disabled={empty}>
+              {empty ? (lang === 'zh' ? '队列里还没有卡' : 'No cards yet') : t('review.card.btn')}
               <svg width="15" height="9" viewBox="0 0 16 10" fill="none" stroke="currentColor" strokeWidth="1.3">
                 <path d="M1 5h13M10 1l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -169,6 +172,18 @@ export default function Review() {
                 {due} / {rows.length} {lang === 'zh' ? '张到期' : 'due'}
               </span>
             </div>
+            {empty ? (
+              <div className="rt-empty">
+                <h3>{lang === 'zh' ? '队列里还没有概念' : 'Nothing in the queue yet'}</h3>
+                <p>{lang === 'zh'
+                  ? '复习卡来自读过的讲次。去目录挑一讲读完，它涉及的概念会自动排期。'
+                  : 'Review cards come from lectures you have read. Finish one lecture and its concepts are scheduled automatically.'}</p>
+                <button className="btn btn-ghost" onClick={() => navigate('/catalog')}>
+                  {lang === 'zh' ? '去目录挑一讲' : 'Browse the catalogue'}
+                </button>
+              </div>
+            ) : (
+            <>
             <div className="review-table" role="table">
               <div className="rt-row rt-th" role="row">
                 <span>{t('review.th.concept')}</span>
@@ -223,6 +238,8 @@ export default function Review() {
                 ? '点任意一行，就从那张卡开始复习。'
                 : 'Click a row to start the session from that card.'}
             </div>
+            </>
+            )}
           </Reveal>
 
           <aside className="review-side">
@@ -232,14 +249,20 @@ export default function Review() {
 
             <Reveal className="heat-card agenda" delay={0.12} y={18}>
               <div className="rail-kick">{lang === 'zh' ? '接下来' : 'Up next'}</div>
-              <ul>
-                {upcoming.map((r) => (
-                  <li key={r.id}>
-                    <span className="ag-when">{r.when}</span>
-                    <b>{catalog.concepts[r.id]?.[lang === 'zh' ? 'zh' : 'en']}</b>
-                  </li>
-                ))}
-              </ul>
+              {upcoming.length ? (
+                <ul>
+                  {upcoming.map((r) => (
+                    <li key={r.id}>
+                      <span className="ag-when">{r.when}</span>
+                      <b>{catalog.concepts[r.id]?.[lang === 'zh' ? 'zh' : 'en']}</b>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="agenda-empty">
+                  {lang === 'zh' ? '读完一讲，这里会出现下一次复习。' : 'Finish a lecture and its next review shows up here.'}
+                </p>
+              )}
               <button className="text-link" onClick={() => setAccountOpen(true)}>
                 {learning.user
                   ? (lang === 'zh' ? `已同步 · ${learning.user.username}` : `Synced · ${learning.user.username}`)
@@ -252,7 +275,7 @@ export default function Review() {
       </div>
 
       <AnimatePresence>
-        {session !== null && (
+        {session !== null && !empty && (
           <Session key="session" start={session} size={size} rows={rows} onClose={() => setSession(null)} />
         )}
       </AnimatePresence>

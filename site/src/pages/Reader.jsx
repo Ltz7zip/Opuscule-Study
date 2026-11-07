@@ -5,8 +5,11 @@ import {
 import { useApp } from '../App';
 import { fetchLesson } from '../api';
 import { renderMath } from '../math';
-import { markRead, readSet } from '../progress';
+import { getCard, dueLabel, markRead, readSet } from '../progress';
 import { EASE, HoldToConfirm, Reveal, Ring, SplitLine } from '../ui';
+
+// Break long CJK titles at punctuation only, never inside a word.
+const splitTitle = (title) => title.match(/[^：:，,、；;]+[：:，,、；;]?/g) || [title];
 
 export default function Reader() {
   const { lang, t, openConcept, showToast, navigate, route, href } = useApp();
@@ -44,7 +47,13 @@ export default function Reader() {
 
   const [open, setOpen] = useState(true);
   const [active, setActive] = useState('');
-  const [size, setSize] = useState(() => Number(localStorage.getItem('opus.size')) || 17);
+  const [seen, setSeen] = useState([]);
+  const [size, setSize] = useState(() => {
+    const saved = Number(localStorage.getItem('opus.size'));
+    if (!saved) return 16;
+    /* 17 是旧默认值，随这次字号收小一并迁移 */
+    return saved === 17 ? 16 : Math.min(20, Math.max(14, saved));
+  });
   const [flash, setFlash] = useState(0);
   const [readDone, setReadDone] = useState(false);
   const artRef = useRef(null);
@@ -54,12 +63,13 @@ export default function Reader() {
   const scrollTarget = useMemo(() => (L ? artRef : null), [L]);
   const { scrollYProgress } = useScroll({ target: scrollTarget, offset: ['start 88%', 'end 92%'] });
   const raw = useSpring(scrollYProgress, { stiffness: 160, damping: 28 });
-  const readPct = useTransform(raw, (v) => `${Math.round(v * 100)}%`);
+  const readPct = useTransform(raw, (v) => `${Math.round(Math.max(0, Math.min(1, v)) * 100)}%`);
 
   useEffect(() => { localStorage.setItem('opus.size', size); }, [size]);
 
   useEffect(() => {
     setActive(L?.sections[0]?.id || '');
+    setSeen([]);
     setReadDone(lesson ? readSet(lesson.mode).has(lesson.slug) : false);
   }, [L, lang, lesson]);
 
@@ -105,6 +115,7 @@ export default function Reader() {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('is-seen');
+            setSeen((prev) => (prev.includes(e.target.id) ? prev : [...prev, e.target.id]));
             io.unobserve(e.target);
           }
         });
@@ -152,6 +163,17 @@ export default function Reader() {
     );
   }
 
+  const leadCard = lesson.concepts?.[0] ? getCard(lesson.concepts[0].slug) : null;
+  const mastery = Math.round(leadCard?.mastery || 0);
+  const masteryState = !leadCard || leadCard.state === 'new'
+    ? (lang === 'zh' ? '新学' : 'New')
+    : leadCard.state === 'relearning'
+      ? (lang === 'zh' ? '重学' : 'Relearning')
+      : (lang === 'zh' ? '复习中' : 'In review');
+  const dueText = leadCard?.due
+    ? dueLabel(leadCard.due, lang)
+    : (lang === 'zh' ? '尚未排期' : 'Not scheduled');
+
   return (
     <div className="reader-page">
       <div className="readbar" aria-hidden="true">
@@ -162,19 +184,24 @@ export default function Reader() {
       <div className="wrap reader">
         <aside className="toc">
           <div className="toc-inner">
-            <div className="toc-kick">{t('reader.toc')}</div>
+            <div className="toc-head">
+              <span className="toc-kick">{t('reader.toc')}</span>
+              <span className="toc-count">{String(L.sections.length).padStart(2, '0')}</span>
+            </div>
             <nav aria-label="toc">
               {L.sections.map((s) => {
                 const on = active === s.id;
+                const done = seen.includes(s.id);
                 return (
                   <a
                     key={s.id}
                     href={`#${s.id}`}
                     onClick={(e) => { e.preventDefault(); jump(s.id); }}
-                    className={on ? 'on' : ''}
+                    className={`${on ? 'on' : ''}${done ? ' is-done' : ''}`}
                   >
                     <span className="toc-num">{s.label}</span>
                     <span>{s.title}</span>
+                    <span className="toc-dot" aria-hidden="true" />
                     {on && <motion.span className="toc-line" layoutId="toc-line" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
                   </a>
                 );
@@ -183,9 +210,9 @@ export default function Reader() {
             <div className="toc-foot">
               <span>{t('reader.size')}</span>
               <div className="size-tools">
-                <button onClick={() => setSize((s) => Math.max(15, s - 1))} aria-label="smaller">A−</button>
+                <button onClick={() => setSize((s) => Math.max(14, s - 1))} aria-label="smaller">A−</button>
                 <span>{size}</span>
-                <button onClick={() => setSize((s) => Math.min(21, s + 1))} aria-label="larger">A+</button>
+                <button onClick={() => setSize((s) => Math.min(20, s + 1))} aria-label="larger">A+</button>
               </div>
             </div>
             <div className="toc-read">
@@ -198,8 +225,12 @@ export default function Reader() {
         <article className="art" ref={artRef}>
           <header className="art-head">
             <div className="art-kicker">{L.kicker}</div>
-            <h1>
-              <SplitLine>{L.title}</SplitLine>
+            <h1 data-flight-target>
+              <SplitLine>
+                {splitTitle(L.title).map((part, i) => (
+                  <span className="nb" key={`${i}-${part}`}>{part}</span>
+                ))}
+              </SplitLine>
             </h1>
             <p className="art-sub">{L.sub}</p>
             <div className="art-meta">
@@ -209,6 +240,12 @@ export default function Reader() {
               <a className="chip chip-accent" href={href(`/path/${lesson.subject.slug}/${lesson.mode}`)}>
                 {lang === 'zh' ? '返回路线' : 'Back to path'}
               </a>
+              <span className={`chip-state ${readDone ? 'is-done' : ''}`}>
+                <i aria-hidden="true" />
+                {readDone
+                  ? (lang === 'zh' ? '已读' : 'Read')
+                  : (lang === 'zh' ? '未读' : 'Unread')}
+              </span>
             </div>
           </header>
 
@@ -348,13 +385,13 @@ export default function Reader() {
           <Reveal className="mcard" delay={0.06} y={18}>
             <div className="mcard-kick">{t('reader.mastery')}</div>
             <div className="mastery-row">
-              <Ring value={12} size={58} stroke={1.5} label="12%" />
+              <Ring value={mastery} size={58} stroke={1.5} label={mastery ? `${mastery}%` : '—'} />
               <div>
-                <b>{lang === 'zh' ? '新学' : 'New'}</b>
-                <span>{t('reader.nextdue')} · {lang === 'zh' ? '明天' : 'Tomorrow'}</span>
+                <b>{masteryState}</b>
+                <span>{t('reader.nextdue')} · {dueText}</span>
               </div>
             </div>
-            <div className="bar"><motion.i initial={{ scaleX: 0 }} whileInView={{ scaleX: 0.12 }} viewport={{ once: true }} transition={{ duration: 1.1, ease: EASE }} /></div>
+            <div className="bar"><motion.i initial={{ scaleX: 0 }} whileInView={{ scaleX: mastery / 100 }} viewport={{ once: true }} transition={{ duration: 1.1, ease: EASE }} /></div>
             <p className="mnote">
               {lang === 'zh'
                 ? '掌握度是一个概率，不是一个勾选框。它会衰减，并按计划被重新验证。'

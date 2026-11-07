@@ -1,12 +1,13 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useApp } from '../App';
+import { fetchLesson } from '../api';
 import { dueLabel, nextReview, readAll } from '../progress';
 import { MODES } from '../data';
+import { armTitleFlight } from '../flight';
 import {
-  ActivityTerrain, Counter, EASE, ElasticSlider, HoldToConfirm, Magnetic, Marquee, MorphText, Reveal,
-  Ring, RollingNumber, Rule, SplitChars, SplitLine, SPRING, Stagger, staggerItem, TERRAIN_SUMMARY,
-  ThemeIcon, Tilt
+  EASE, Magnetic, Marquee, Reveal, Ring, RollingNumber, Rule, SplitChars, SplitLine,
+  Stagger, staggerItem, Tilt
 } from '../ui';
 
 const MODE_KEYS = ['mastery', 'applied', 'literacy'];
@@ -185,6 +186,10 @@ export default function Home() {
                   className="subject-row"
                   href={href(`/path/${s.slug}/${s.modes[0] || 'mastery'}`)}
                   data-cursor="open"
+                  onClick={(e) => armTitleFlight(
+                    e.currentTarget.querySelector('.s-name'),
+                    lang === 'zh' ? s.zh : s.en
+                  )}
                 >
                   <span className="s-index">{String(i + 1).padStart(2, '0')}</span>
                   <span className="s-name">
@@ -233,7 +238,7 @@ export default function Home() {
             note={t('home.study.note')}
             index="03"
           />
-          <StudyBoard />
+          <ShowcaseBoard />
         </div>
       </section>
 
@@ -389,7 +394,15 @@ function ContinueCard() {
             <Magnetic strength={6}>
               <button
                 className="btn btn-primary btn-arrow"
-                onClick={() => navigate(lesson?.path || '/map')}
+                onClick={(e) => {
+                  if (lesson) {
+                    armTitleFlight(
+                      e.currentTarget.closest('.continue')?.querySelector('.continue-title'),
+                      lang === 'zh' ? lesson.zh : lesson.en
+                    );
+                  }
+                  navigate(lesson?.path || '/map');
+                }}
               >
                 {t('home.cont.btn')}
                 <svg width="15" height="9" viewBox="0 0 16 10" fill="none" stroke="currentColor" strokeWidth="1.3">
@@ -404,9 +417,9 @@ function ContinueCard() {
   );
 }
 
-/* --------------------------------------------------------- interaction index */
+/* ------------------------------------------------------------ content preview */
 
-function StudyHead({ tag, index }) {
+function PanelHead({ tag, index }) {
   return (
     <div className="study-top">
       <span className="study-tag">{tag}</span>
@@ -415,134 +428,162 @@ function StudyHead({ tag, index }) {
   );
 }
 
-function StudyBoard() {
-  const { lang, theme, toggleTheme } = useApp();
+function firstParagraph(html) {
+  if (!html) return '';
+  const para = html.split(/<\/p>/i)[0] || html;
+  return para
+    .replace(/<[^>]+>/g, '')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function ShowcaseBoard() {
+  const { lang, href, catalog, learning, openConcept } = useApp();
   const zh = lang === 'zh';
-  const [quota, setQuota] = useState(6);
-  const [score, setScore] = useState(38);
-  const [held, setHeld] = useState(0);
+  const subject = catalog.subjects.find((s) => s.slug === 'dl') || catalog.subjects[0];
+  const target = subject?.unitList?.[0]?.lessons?.[0];
+  const path = target?.path || '';
+  const [lesson, setLesson] = useState(null);
+
+  useEffect(() => {
+    const parts = path.split('/').filter(Boolean);
+    if (parts.length < 4) return undefined;
+    let alive = true;
+    setLesson(null);
+    fetchLesson({ subject: parts[1], unit: parts[2], order: parts[3], mode: 'mastery', lang })
+      .then((data) => { if (alive) setLesson(data); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [path, lang]);
+
+  const next = useMemo(() => nextReview(), [learning]);
+  const title = lesson?.title || (zh ? target?.zh : target?.en) || '';
+  const unitName = lesson?.unit?.title
+    ? (zh ? lesson.unit.title.zh : lesson.unit.title.en)
+    : (zh ? subject?.zh : subject?.en) || '';
+  const excerpt = firstParagraph(lesson?.sections?.[0]?.html);
+  const own = lesson?.concepts || [];
+  const focus = own[own.length - 1];
+  const pre = (lesson?.prereq || []).filter((c) => c.slug !== subject?.slug);
+  const post = (lesson?.related || [])
+    .filter((c) => c.slug !== subject?.slug && !pre.some((p) => p.slug === c.slug))
+    .slice(0, 2);
+  const nameOf = (c) => (zh ? c?.title?.zh : c?.title?.en) || c?.slug || '';
+  const card = (next && catalog.concepts[next.concept]) || catalog.concepts.backprop;
+  const cardName = card ? (zh ? card.zh : card.en) : '';
+  const cardDef = card ? (zh ? card.def : card.defEn) : '';
 
   return (
-    <div className="study-grid">
-      <Reveal className="study-card">
-        <StudyHead tag="HOLD" index="01" />
-        <h3 className="study-title">{zh ? '按住，才作数' : 'Hold, then it counts'}</h3>
-        <p className="study-desc">
-          {zh
-            ? '松手会倒带。确认动作不该被误触完成。'
-            : 'Release early and it rewinds. A confirmation should never happen by accident.'}
-        </p>
-        <HoldToConfirm
-          className="study-hold"
-          label={zh ? '按住标记已读' : 'Hold to mark read'}
-          holdingLabel={zh ? '继续按住…' : 'Keep holding…'}
-          doneLabel={zh ? '已标记' : 'Marked read'}
-          onConfirm={() => setHeld((v) => v + 1)}
-          duration={1100}
+    <div className="showcase-grid">
+      <Reveal className="study-card showcase-lead" y={16}>
+        <PanelHead
+          tag={zh ? '本讲摘录' : 'Excerpt'}
+          index={`${subject?.code || 'D01'} · ${String(target?.ordinal || 1).padStart(2, '0')}`}
         />
+        <h3 className="showcase-title">{title || (zh ? '正在取这一讲' : 'Loading the lecture')}</h3>
+        <div className="showcase-sub">{lesson?.subtitle || unitName}</div>
+        <p className="showcase-body">
+          {excerpt || (zh ? '正在取这一讲的正文……' : 'Fetching the lecture text…')}
+        </p>
+        <div className="showcase-facts">
+          <span><b>{lesson?.minutes || 12}</b>{zh ? '分钟' : ' min'}</span>
+          <span><b>{own.length || 2}</b>{zh ? '个概念' : ' concepts'}</span>
+          <span><b>{pre.length}</b>{zh ? '个前置' : ' prerequisites'}</span>
+        </div>
+        {lesson?.sections?.length ? (
+          <div className="showcase-sections">
+            <span className="showcase-sec-cap">
+              {zh ? `本讲结构 · ${lesson.sections.length} 节` : `Inside · ${lesson.sections.length} sections`}
+            </span>
+            <ul>
+              {lesson.sections.slice(0, 4).map((sec) => (
+                <li key={sec.id}>
+                  <span className="ss-num">{sec.label}</span>
+                  <span className="ss-title">{sec.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <div className="study-foot">
-          <span>{zh ? '已确认' : 'Confirmed'} <b>{held}</b> {zh ? '次' : 'times'}</span>
-          <span className="study-hint">1.1s</span>
+          <span className="study-foot-unit">{unitName}</span>
+          <a
+            className="showcase-link"
+            href={href(path || '/catalog')}
+            onClick={(e) => armTitleFlight(
+              e.currentTarget.closest('.study-card')?.querySelector('.showcase-title'),
+              title
+            )}
+          >
+            {zh ? '读这一讲' : 'Read this lecture'}
+            <i aria-hidden="true">↗</i>
+          </a>
         </div>
       </Reveal>
 
-      <Reveal className="study-card" delay={0.06}>
-        <StudyHead tag="SLIDE" index="02" />
-        <h3 className="study-title">{zh ? '拖到一个具体数字' : 'Drag to a specific number'}</h3>
-        <p className="study-desc">
-          {zh
-            ? '滑块会横向拉伸，标签跟着倾斜，松手吸附到最近的档位。'
-            : 'The rail stretches, the tag tilts with the drag, and release settles on the nearest detent.'}
-        </p>
-        <ElasticSlider
-          label={zh ? '每日新卡' : 'New cards / day'}
-          value={quota}
-          onChange={setQuota}
-          min={1}
-          max={12}
-          step={1}
-          marks={[1, 4, 8, 12]}
-          unit={zh ? ' 张' : ' cards'}
-        />
+      <Reveal className="study-card showcase-dep" delay={0.06} y={16}>
+        <PanelHead tag={zh ? '依赖' : 'Requires'} index="GRAPH" />
+        <ul className="dep">
+          <li className="dep-row">
+            <span className="dep-key">{zh ? '前置' : 'Before'}</span>
+            <span className="dep-nodes">
+              {pre.length
+                ? pre.slice(0, 2).map((c) => (
+                  <button type="button" key={c.slug} className="dep-node" onClick={() => openConcept(c.slug)}>
+                    {nameOf(c)}
+                  </button>
+                ))
+                : <i className="dep-none">{zh ? '无' : 'None'}</i>}
+            </span>
+          </li>
+          <li className="dep-row">
+            <span className="dep-key">{zh ? '本讲' : 'Here'}</span>
+            <span className="dep-nodes">
+              <span className="dep-node is-focus">
+                {focus ? nameOf(focus) : title}
+              </span>
+            </span>
+          </li>
+          <li className="dep-row">
+            <span className="dep-key">{zh ? '后续' : 'After'}</span>
+            <span className="dep-nodes">
+              {post.length
+                ? post.map((c) => (
+                  <button type="button" key={c.slug} className="dep-node" onClick={() => openConcept(c.slug)}>
+                    {nameOf(c)}
+                  </button>
+                ))
+                : <i className="dep-none">{zh ? '终点' : 'Endpoint'}</i>}
+            </span>
+          </li>
+        </ul>
         <div className="study-foot">
-          <span>{zh ? '一周约' : 'About'} <b>{quota * 7}</b> {zh ? '张' : 'cards a week'}</span>
-          <span className="study-hint">1–12</span>
+          <span>{pre.length + post.length + 1} {zh ? '个节点' : 'nodes'}</span>
+          <a className="showcase-link" href={href('/map')}>
+            {zh ? '在依赖图里看' : 'Open in graph'}
+            <i aria-hidden="true">↗</i>
+          </a>
         </div>
       </Reveal>
 
-      <Reveal className="study-card" delay={0.12}>
-        <StudyHead tag="ROLL" index="03" />
-        <h3 className="study-title">{zh ? '只让变的数字动' : 'Only the changed digits move'}</h3>
-        <p className="study-desc">
-          {zh
-            ? '调整数值，十位与个位各自滚动，不重排整块版面。'
-            : 'Change the value: each digit rolls on its own instead of re-laying-out the number.'}
-        </p>
-        <div className="study-count">
-          <span className="study-big"><RollingNumber value={score} /><i>%</i></span>
-          <div className="study-stepper">
-            <button type="button" onClick={() => setScore((s) => Math.max(0, s - 1))} aria-label="minus">−</button>
-            <button type="button" onClick={() => setScore((s) => Math.min(100, s + 1))} aria-label="plus">+</button>
+      <Reveal className="study-card showcase-rev" delay={0.12} y={16}>
+        <PanelHead tag={zh ? '复习卡' : 'Review card'} index={next ? 'DUE' : 'SAMPLE'} />
+        <div className="rev">
+          <span className="rev-mark" aria-hidden="true">Q</span>
+          <div>
+            <div className="rev-name">{cardName}</div>
+            <p className="rev-def">{cardDef}</p>
           </div>
         </div>
-        <div className="study-meter" aria-hidden="true">
-          <motion.i animate={{ width: `${score}%` }} transition={SPRING.smooth} />
-        </div>
         <div className="study-foot">
-          <span>{zh ? '掌握度' : 'Mastery'}</span>
-          <span className="study-hint">0–100</span>
-        </div>
-      </Reveal>
-
-      <Reveal className="study-card" delay={0.18}>
-        <StudyHead tag="TURN" index="04" />
-        <h3 className="study-title">{zh ? '两个图标，一个方向' : 'Two icons, one direction'}</h3>
-        <p className="study-desc">
-          {zh
-            ? '日月沿同一方向旋转替换，切换后图标偏移一像素，像被留在暗处。'
-            : 'Sun and moon turn the same way. After switching, the icon rests one hair off-centre, as if left in the dark.'}
-        </p>
-        <button type="button" className="study-theme" onClick={toggleTheme}>
-          <ThemeIcon dark={theme === 'dark'} />
-          <MorphText text={theme === 'dark' ? (zh ? '深色' : 'Dark') : (zh ? '浅色' : 'Light')} />
-          <span className="study-theme-hint">{zh ? '点击切换' : 'Click to switch'}</span>
-        </button>
-        <div className="study-foot">
-          <span>{zh ? '当前主题' : 'Current theme'}</span>
-          <span className="study-hint">{theme}</span>
-        </div>
-      </Reveal>
-
-      <Reveal className="study-card is-wide" delay={0.24}>
-        <div className="study-wide-copy">
-          <StudyHead tag="TERRAIN" index="05" />
-          <h3 className="study-title">{zh ? '一周的节奏' : 'A weekly rhythm'}</h3>
-          <p className="study-desc">
-            {zh
-              ? '七天二十四小时，每小时一次复习。柱子越深越高，那天那个时段就读得越多。拖动转一转，悬停一根柱子读出数字。'
-              : 'Seven days by twenty-four hours, one bar per hour. Drag to turn it, hover a bar to read its numbers.'}
-          </p>
-          <div className="terrain-stats">
-            <div className="terrain-stat">
-              <b><RollingNumber value={TERRAIN_SUMMARY.total} pad={2} /></b>
-              <span>{zh ? '本周复习' : 'Reviews'}</span>
-            </div>
-            <div className="terrain-stat">
-              <b><RollingNumber value={TERRAIN_SUMMARY.peak[0].value} pad={2} /></b>
-              <span>{zh ? '峰值时段' : 'Peak hour'}</span>
-            </div>
-            <div className="terrain-stat">
-              <b><RollingNumber value={7} pad={2} /></b>
-              <span>{zh ? '天窗口' : 'Days'}</span>
-            </div>
-          </div>
-          <div className="study-foot">
-            <span>{zh ? '记录只留在这台设备上' : 'Records stay on this device'}</span>
-            <span className="study-hint">local</span>
-          </div>
-        </div>
-        <div className="study-wall">
-          <ActivityTerrain lang={lang} />
+          <span>{next ? dueLabel(next.due, lang) : (zh ? '还没有复习记录' : 'No review history yet')}</span>
+          <a className="showcase-link" href={href('/review')}>
+            {zh ? '开始复习' : 'Start review'}
+            <i aria-hidden="true">↗</i>
+          </a>
         </div>
       </Reveal>
     </div>

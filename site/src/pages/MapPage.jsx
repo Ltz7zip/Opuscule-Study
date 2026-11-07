@@ -3,7 +3,7 @@ import {
   AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring
 } from 'framer-motion';
 import { useApp } from '../App';
-import { EASE, MorphText, Reveal, SplitLine, SPRING } from '../ui';
+import { EASE, EmptyState, MorphText, Reveal, SplitLine, SPRING } from '../ui';
 
 const MIN_ZOOM = 0.34;
 const MAX_ZOOM = 1.8;
@@ -391,11 +391,26 @@ export default function MapPage() {
     return out;
   }, [CONCEPT_IDS, concepts]);
 
-  if (catalog.status === 'loading' || !CONCEPT_IDS.length) {
+  if (catalog.status === 'loading') {
     return (
       <div className="wrap path-loading">
         <div className="loader" aria-hidden="true"><i /><i /><i /></div>
         <p>{lang === 'zh' ? '正在读取知识图…' : 'Loading the graph…'}</p>
+      </div>
+    );
+  }
+
+  if (!CONCEPT_IDS.length) {
+    return (
+      <div className="wrap">
+        <EmptyState
+          title={lang === 'zh' ? '知识图还没有节点' : 'The graph has no nodes yet'}
+          text={lang === 'zh'
+            ? '目录里还没有可绘制的概念。补上第一讲，依赖关系会在这里长出来。'
+            : 'There are no concepts to draw yet. Add a first lecture and the dependencies will grow here.'}
+          btn={lang === 'zh' ? '浏览目录' : 'Browse the catalogue'}
+          onGo={() => navigate('/catalog')}
+        />
       </div>
     );
   }
