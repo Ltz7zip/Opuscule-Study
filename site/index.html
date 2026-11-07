@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hans" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Opuscule · 一个自用的学习工作台</title>
+    <meta name="description" content="Opuscule — 一个公开的学习工作台。三条轨道、中英双语、依赖图与无门禁的阅读路径。" />
+    <meta name="theme-color" content="#eef1f6" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Opuscule" />
+    <meta property="og:title" content="Opuscule · 一个自用的学习工作台" />
+    <meta property="og:description" content="三条轨道、中英双语、依赖图与无门禁的阅读路径。" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23eef1f6'/%3E%3Crect x='10' y='10' width='12' height='12' fill='%230562ef' transform='rotate(45 16 16)'/%3E%3C/svg%3E"
+    />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('opus.theme');
+          var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.dataset.theme = stored || (dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

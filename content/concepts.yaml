@@ -1,0 +1,1573 @@
+# 概念节点与依赖边；坐标用于知识图初始布局
+concepts:
+  - slug: "elem"
+    title_zh: "初等数学"
+    title_en: "Elementary Mathematics"
+    def_zh: "代数运算、方程、函数与平面几何。它是所有方向的共同前置，本身不指向任何单一专业。"
+    def_en: "Algebra, equations, functions, and plane geometry. The shared foundation for every direction, and not tied to any single field."
+    field: "math"
+    x: 40
+    y: 238
+    prereq: []
+    used_by: ["calc","la","disc"]
+  - slug: "calc"
+    title_zh: "高等数学"
+    title_en: "Calculus"
+    def_zh: "极限、导数、积分与级数。它提供描述变化率的语言，是梯度类方法的源头。"
+    def_en: "Limits, derivatives, integrals, and series. It supplies the language of change, and is the source of every gradient method."
+    field: "math"
+    x: 205
+    y: 120
+    prereq: ["elem"]
+    used_by: ["grad"]
+  - slug: "la"
+    title_zh: "线性代数"
+    title_en: "Linear Algebra"
+    def_zh: "向量、矩阵、线性变换与特征值。它把高维运算写成可批量计算的形状。"
+    def_en: "Vectors, matrices, linear maps, and eigenvalues. It turns high-dimensional work into shapes you can batch."
+    field: "math"
+    x: 205
+    y: 238
+    prereq: ["elem"]
+    used_by: ["matrix"]
+  - slug: "disc"
+    title_zh: "离散数学"
+    title_en: "Discrete Mathematics"
+    def_zh: "逻辑、集合、图论与计数。它是算法与安全类课程的语言基础。"
+    def_en: "Logic, sets, graph theory, and counting. The language beneath algorithms and security."
+    field: "math"
+    x: 205
+    y: 356
+    prereq: ["elem"]
+    used_by: ["sec"]
+  - slug: "grad"
+    title_zh: "梯度下降"
+    title_en: "Gradient Descent"
+    def_zh: "沿负梯度方向小步更新参数，使损失下降。步长由学习率控制。"
+    def_en: "Step against the gradient to lower the loss. The learning rate controls the step size."
+    field: "ai"
+    x: 380
+    y: 120
+    prereq: ["calc"]
+    used_by: ["backprop"]
+  - slug: "matrix"
+    title_zh: "矩阵乘法"
+    title_en: "Matrix Multiplication"
+    def_zh: "行与列逐项相乘再相加。结果的第 i 行第 j 列，来自左矩阵第 i 行和右矩阵第 j 列。"
+    def_en: "Rows meet columns: entry (i, j) of the result is the dot product of row i on the left and column j on the right."
+    field: "math"
+    x: 380
+    y: 238
+    prereq: ["la"]
+    used_by: ["backprop","dl"]
+  - slug: "chain"
+    title_zh: "链式法则"
+    title_en: "Chain Rule"
+    def_zh: "复合函数求导：外层导数乘以内层导数。f(g(x)) 的导数是 f′(g(x))·g′(x)。"
+    def_en: "The derivative of a composite function is the product of the layer derivatives: f′(g(x))·g′(x)."
+    field: "math"
+    x: 545
+    y: 46
+    prereq: ["calc"]
+    used_by: ["backprop"]
+  - slug: "backprop"
+    title_zh: "反向传播"
+    title_en: "Backpropagation"
+    def_zh: "从输出层向前，逐层用链式法则计算每个参数的梯度，复用前向缓存的中间结果。"
+    def_en: "From the output backwards, use the chain rule layer by layer to compute every parameter gradient, reusing cached forward values."
+    field: "ai"
+    x: 545
+    y: 120
+    prereq: ["grad","chain","matrix"]
+    used_by: ["dl"]
+  - slug: "dl"
+    title_zh: "深度学习"
+    title_en: "Deep Learning"
+    def_zh: "用多层可微函数拟合数据分布。核心是表示学习、梯度优化与规模化训练。"
+    def_en: "Fit data distributions with stacks of differentiable functions: representation learning, gradient optimisation, and scale."
+    field: "ai"
+    x: 700
+    y: 190
+    prereq: ["backprop","matrix"]
+    used_by: []
+  - slug: "sec"
+    title_zh: "网络安全"
+    title_en: "Cybersecurity"
+    def_zh: "网络与系统安全的攻防方法，涵盖密码学、认证、漏洞与响应。"
+    def_en: "Attack and defense across networks and systems: cryptography, authentication, vulnerabilities, and response."
+    field: "cs"
+    x: 700
+    y: 330
+    prereq: ["disc"]
+    used_by: []
+  - slug: "analysis"
+    title_zh: "数学分析"
+    title_en: "Mathematical Analysis"
+    def_zh: "以集合、映射和极限为语言，严格研究函数与连续变化的学科。"
+    def_en: "The rigorous study of functions and continuous change, built on sets, maps, and limits."
+    field: "math"
+    x: 40
+    y: 120
+    prereq: ["elem"]
+    used_by: ["set"]
+  - slug: "set"
+    title_zh: "集合"
+    title_en: "Set"
+    def_zh: "具有确定性质的对象汇成的整体。元素与集合之间用“属于”连接。"
+    def_en: "A collection of objects sharing a definite property. Elements belong to the set."
+    field: "math"
+    x: 40
+    y: 46
+    prereq: ["analysis"]
+    used_by: ["setops","cartesian"]
+  - slug: "setops"
+    title_zh: "集合运算"
+    title_en: "Set Operations"
+    def_zh: "并、交、差、补。它们把“或、且、不属于”翻译成集合之间的操作。"
+    def_en: "Union, intersection, difference, complement — “or”, “and”, and “not” turned into operations on sets."
+    field: "math"
+    x: 205
+    y: 46
+    prereq: ["set"]
+    used_by: ["cartesian"]
+  - slug: "cartesian"
+    title_zh: "Descartes 积"
+    title_en: "Cartesian Product"
+    def_zh: "A×B 是所有有序对 (x,y) 的集合，其中 x∈A、y∈B。它是坐标与关系的起点。"
+    def_en: "A×B is the set of all ordered pairs (x, y) with x in A and y in B. It is where coordinates and relations begin."
+    field: "math"
+    x: 380
+    y: 46
+    prereq: ["set","setops"]
+    used_by: []
+  - slug: "map"
+    title_zh: "映射"
+    title_en: "Map"
+    def_zh: "把集合 A 的每个元素按规则唯一地送到集合 B 的对应元素。映射是函数在任意集合上的推广。"
+    def_en: "A rule that sends every element of A to exactly one element of B. Maps generalise functions beyond the number line."
+    field: "math"
+    x: 205
+    y: 190
+    prereq: ["set","cartesian"]
+    used_by: ["analysis"]
+  - slug: "countable"
+    title_zh: "可数集"
+    title_en: "Countable Set"
+    def_zh: "能与自然数集建立一一对应的集合。有理数可数，实数不可数，这是无穷之间也有大小的证据。"
+    def_en: "A set that can be put in one-to-one correspondence with the naturals. The rationals are countable, the reals are not."
+    field: "math"
+    x: 700
+    y: 120
+    prereq: ["map"]
+    used_by: []
+  - slug: "linmap"
+    title_zh: "线性映射"
+    title_en: "Linear Map"
+    def_zh: "保持加法与数乘的映射：T(x+y)=T(x)+T(y)，T(cx)=cT(x)。矩阵是它在给定基下的坐标写法。"
+    def_en: "A map that preserves addition and scaling: T(x+y)=T(x)+T(y) and T(cx)=cT(x). Matrices are its coordinates in a chosen basis."
+    field: "math"
+    x: 380
+    y: 330
+    prereq: ["la"]
+    used_by: ["matrix"]
+  - slug: "basis"
+    title_zh: "基与坐标"
+    title_en: "Basis and Coordinates"
+    def_zh: "基是一组线性无关且能张满整个空间的向量。选定基之后，每个向量才有唯一的一组坐标。"
+    def_en: "A basis is a linearly independent set that spans the space. Choose one, and every vector gets a unique coordinate list."
+    field: "math"
+    x: 545
+    y: 330
+    prereq: ["linmap"]
+    used_by: ["matrix"]
+  - slug: "perceptron"
+    title_zh: "感知机"
+    title_en: "Perceptron"
+    def_zh: "最早的线性分类器：把输入加权求和，过阈值决定类别。它的局限直接催生了多层网络。"
+    def_en: "The first linear classifier: a weighted sum of inputs, thresholded into a class. Its limits motivated multilayer networks."
+    field: "ai"
+    x: 700
+    y: 46
+    prereq: ["matrix"]
+    used_by: ["dl"]
+  - slug: "loss"
+    title_zh: "损失函数"
+    title_en: "Loss Function"
+    def_zh: "把预测与目标的差距压缩成一个数，训练就是把这个数往小推。它决定了模型究竟在优化什么。"
+    def_en: "A single number summarising the gap between prediction and target. Training pushes that number down, so the loss defines what is optimised."
+    field: "ai"
+    x: 545
+    y: 190
+    prereq: ["calc"]
+    used_by: ["backprop"]
+  - slug: "conv"
+    title_zh: "卷积"
+    title_en: "Convolution"
+    def_zh: "用一个小的卷积核在输入上滑动，每个位置做加权求和。它让同一组参数在整张图上共享。"
+    def_en: "Slide a small kernel over the input and take a weighted sum at each position. One parameter set is shared across the whole image."
+    field: "ai"
+    x: 545
+    y: 440
+    prereq: ["matrix"]
+    used_by: ["cnn"]
+  - slug: "pooling"
+    title_zh: "池化"
+    title_en: "Pooling"
+    def_zh: "在小窗口内取最大值或平均值，压缩特征图尺寸。它降低计算量，并带来一定的平移不变性。"
+    def_en: "Take the max or mean inside a small window to shrink a feature map: less computation, and a little translation invariance."
+    field: "ai"
+    x: 700
+    y: 440
+    prereq: ["conv"]
+    used_by: ["cnn"]
+  - slug: "cnn"
+    title_zh: "卷积神经网络"
+    title_en: "Convolutional Network"
+    def_zh: "以卷积和池化堆叠成的网络。局部连接、权重共享，使它天然适合图像与网格结构的数据。"
+    def_en: "A network stacked from convolutions and pooling. Local connectivity and weight sharing make it a natural fit for images and grids."
+    field: "ai"
+    x: 860
+    y: 440
+    prereq: ["conv","pooling"]
+    used_by: ["residual"]
+  - slug: "residual"
+    title_zh: "残差连接"
+    title_en: "Residual Connection"
+    def_zh: "让一层的输出再加上它的输入：y = F(x) + x。梯度多了一条直通路径，网络因此可以堆得很深。"
+    def_en: "Add a layer's input to its output: y = F(x) + x. Gradients get a shortcut, so networks can be stacked much deeper."
+    field: "ai"
+    x: 860
+    y: 330
+    prereq: ["cnn"]
+    used_by: ["transformer"]
+  - slug: "rnn"
+    title_zh: "循环神经网络"
+    title_en: "Recurrent Network"
+    def_zh: "在序列上逐步展开同一个单元，把上一步的隐状态传进下一步。参数在时间上共享。"
+    def_en: "Unroll the same cell along a sequence, passing the previous hidden state forward. Parameters are shared across time."
+    field: "ai"
+    x: 545
+    y: 530
+    prereq: ["perceptron"]
+    used_by: ["lstm"]
+  - slug: "lstm"
+    title_zh: "长短期记忆"
+    title_en: "Long Short-Term Memory"
+    def_zh: "带门控的循环单元：遗忘门、输入门、输出门共同控制信息的保留与丢弃，缓解长序列上的梯度消失。"
+    def_en: "A gated recurrent cell: forget, input, and output gates decide what to keep and what to drop, easing vanishing gradients over long sequences."
+    field: "ai"
+    x: 700
+    y: 530
+    prereq: ["rnn"]
+    used_by: ["seq2seq"]
+  - slug: "seq2seq"
+    title_zh: "序列到序列"
+    title_en: "Sequence to Sequence"
+    def_zh: "编码器把输入序列压成一个状态，解码器据此逐步生成输出序列。机器翻译是它的经典场景。"
+    def_en: "An encoder compresses the input sequence into one state; a decoder generates the output sequence step by step. Machine translation is the classic case."
+    field: "ai"
+    x: 860
+    y: 530
+    prereq: ["lstm"]
+    used_by: ["attention"]
+  - slug: "attention"
+    title_zh: "注意力机制"
+    title_en: "Attention"
+    def_zh: "用查询与键的相似度算出权重，再对值加权求和。它让模型在每一步自行决定看哪里。"
+    def_en: "Score queries against keys, turn the scores into weights, and take a weighted sum of values. The model decides where to look at each step."
+    field: "ai"
+    x: 545
+    y: 620
+    prereq: ["seq2seq"]
+    used_by: ["transformer"]
+  - slug: "transformer"
+    title_zh: "Transformer"
+    title_en: "Transformer"
+    def_zh: "完全由注意力堆叠成的架构，没有循环。并行处理整段序列，是当代大模型的基本骨架。"
+    def_en: "An architecture built entirely from attention, with no recurrence. It processes a whole sequence in parallel and underpins modern large models."
+    field: "ai"
+    x: 700
+    y: 620
+    prereq: ["attention","residual"]
+    used_by: ["pretrain"]
+  - slug: "pretrain"
+    title_zh: "预训练与微调"
+    title_en: "Pretraining and Fine-tuning"
+    def_zh: "先在大规模通用数据上学一个通用表示，再在小规模任务数据上调整。它把数据成本前移、任务成本压低。"
+    def_en: "Learn a general representation on large generic data, then adapt it on small task data. Data cost moves upstream, task cost drops."
+    field: "ai"
+    x: 860
+    y: 620
+    prereq: ["transformer","loss"]
+    used_by: []
+  - slug: "regular"
+    title_zh: "正则化"
+    title_en: "Regularisation"
+    def_zh: "在训练目标上加约束，抑制模型对训练集的过度拟合。权重衰减与 Dropout 是最常用的两种。"
+    def_en: "Add a constraint to the training objective to curb overfitting: weight decay and dropout are the two workhorses."
+    field: "ai"
+    x: 205
+    y: 520
+    prereq: ["loss"]
+    used_by: ["eval"]
+  - slug: "batchnorm"
+    title_zh: "归一化"
+    title_en: "Normalisation"
+    def_zh: "把一层的输入按批统计量标准化，再学一个缩放与平移。它稳定训练、允许更大的学习率。"
+    def_en: "Standardise a layer's input with batch statistics, then learn a scale and shift. Training stabilises and larger learning rates become viable."
+    field: "ai"
+    x: 205
+    y: 610
+    prereq: ["grad"]
+    used_by: []
+  - slug: "adam"
+    title_zh: "自适应优化"
+    title_en: "Adaptive Optimisation"
+    def_zh: "为每个参数单独维护梯度的一阶与二阶矩估计，并据此调整步长。Adam 是最常用的实现。"
+    def_en: "Keep per-parameter estimates of the first and second moments of the gradient and scale the step accordingly. Adam is the common implementation."
+    field: "ai"
+    x: 380
+    y: 520
+    prereq: ["grad"]
+    used_by: []
+  - slug: "eval"
+    title_zh: "模型评估"
+    title_en: "Model Evaluation"
+    def_zh: "在没参与训练的数据上估计泛化表现。划分、交叉验证和误差分析都属于这件事。"
+    def_en: "Estimate generalisation on data the model never trained on: splits, cross-validation, and error analysis all belong here."
+    field: "ai"
+    x: 205
+    y: 430
+    prereq: ["loss"]
+    used_by: ["metric","deploy"]
+  - slug: "metric"
+    title_zh: "评估指标"
+    title_en: "Evaluation Metric"
+    def_zh: "把预测与标注的对照压缩成一个可比较的数：准确率、精确率、召回率、F1、AUC 等。"
+    def_en: "Compress predictions against labels into one comparable number: accuracy, precision, recall, F1, AUC, and friends."
+    field: "ai"
+    x: 380
+    y: 610
+    prereq: ["eval"]
+    used_by: []
+  - slug: "deploy"
+    title_zh: "推理与部署"
+    title_en: "Inference and Deployment"
+    def_zh: "把训练好的模型放进真实系统：冻结参数、优化延迟与显存、监控输入分布与输出质量。"
+    def_en: "Put a trained model into a real system: freeze parameters, tune latency and memory, monitor input drift and output quality."
+    field: "ai"
+    x: 860
+    y: 710
+    prereq: ["eval"]
+    used_by: []
+  - slug: "det"
+    title_zh: "行列式"
+    title_en: "Determinant"
+    def_zh: "把方阵映成一个数：它衡量线性变换对体积的伸缩倍数，也决定矩阵是否可逆。"
+    def_en: "A square matrix mapped to one number: the volume scaling of the linear map, and the test for invertibility."
+    field: "math"
+    x: 40
+    y: 780
+    prereq: ["matrix"]
+    used_by: ["cofactor","cramer"]
+  - slug: "cofactor"
+    title_zh: "余子式与代数余子式"
+    title_en: "Minor and Cofactor"
+    def_zh: "划掉某行某列后剩下的小行列式，再配上符号 (-1)^{i+j}。展开公式就靠它们拼起来。"
+    def_en: "The smaller determinant left after deleting a row and a column, signed by (-1)^{i+j}. Cofactor expansion is built from them."
+    field: "math"
+    x: 205
+    y: 780
+    prereq: ["det"]
+    used_by: ["cramer"]
+  - slug: "cramer"
+    title_zh: "克拉默法则"
+    title_en: "Cramer's Rule"
+    def_zh: "当系数行列式不为零时，用行列式之比直接写出线性方程组的唯一解。"
+    def_en: "When the coefficient determinant is nonzero, the unique solution of a linear system is a ratio of determinants."
+    field: "math"
+    x: 380
+    y: 780
+    prereq: ["det","cofactor"]
+    used_by: []
+  - slug: "inverse"
+    title_zh: "逆矩阵"
+    title_en: "Inverse Matrix"
+    def_zh: "满足 AB = BA = I 的方阵 B。存在当且仅当行列式不为零。"
+    def_en: "The square matrix B with AB = BA = I. It exists exactly when the determinant is nonzero."
+    field: "math"
+    x: 40
+    y: 870
+    prereq: ["matrix","det"]
+    used_by: []
+  - slug: "elementary"
+    title_zh: "初等变换"
+    title_en: "Elementary Operations"
+    def_zh: "交换两行、某行乘非零数、某行加上另一行的倍数。它们不改变线性方程组的解集。"
+    def_en: "Swap two rows, scale a row, or add a multiple of one row to another. The solution set is unchanged."
+    field: "math"
+    x: 205
+    y: 870
+    prereq: ["matrix"]
+    used_by: ["rank"]
+  - slug: "rank"
+    title_zh: "矩阵的秩"
+    title_en: "Rank"
+    def_zh: "行阶梯形中非零行的个数，也是最大线性无关行（列）数。它衡量矩阵真正携带的信息量。"
+    def_en: "The number of nonzero rows in row echelon form, equal to the largest independent set of rows or columns."
+    field: "math"
+    x: 380
+    y: 870
+    prereq: ["elementary"]
+    used_by: ["vecgroup"]
+  - slug: "lindep"
+    title_zh: "线性相关性"
+    title_en: "Linear Dependence"
+    def_zh: "若存在不全为零的系数使组合等于零向量，则这组向量线性相关；否则线性无关。"
+    def_en: "A set of vectors is dependent if some nontrivial combination equals zero, and independent otherwise."
+    field: "math"
+    x: 545
+    y: 780
+    prereq: ["matrix"]
+    used_by: ["vecgroup","vecspace"]
+  - slug: "vecgroup"
+    title_zh: "向量组的秩"
+    title_en: "Rank of a Vector Set"
+    def_zh: "向量组中极大线性无关组所含向量的个数，等于以它们为列构成的矩阵的秩。"
+    def_en: "The size of a maximal independent subset, equal to the rank of the matrix whose columns are those vectors."
+    field: "math"
+    x: 545
+    y: 870
+    prereq: ["lindep","rank"]
+    used_by: []
+  - slug: "eigens"
+    title_zh: "特征值与特征向量"
+    title_en: "Eigenvalues and Eigenvectors"
+    def_zh: "满足 Ax = λx 的标量 λ 与向量 x：变换只把 x 拉长或压短，不改变方向。"
+    def_en: "Scalars λ and vectors x with Ax = λx: the map stretches x without turning it."
+    field: "math"
+    x: 700
+    y: 780
+    prereq: ["det","lindep"]
+    used_by: ["similar"]
+  - slug: "similar"
+    title_zh: "相似矩阵"
+    title_en: "Similar Matrices"
+    def_zh: "B = P^{-1}AP。它们是同一个线性变换在不同基下的两种写法，特征值完全相同。"
+    def_en: "B = P^{-1}AP. Two coordinate descriptions of one linear map, with identical eigenvalues."
+    field: "math"
+    x: 700
+    y: 870
+    prereq: ["eigens"]
+    used_by: ["quadratic"]
+  - slug: "quadratic"
+    title_zh: "二次型"
+    title_en: "Quadratic Form"
+    def_zh: "形如 x^T A x 的二次齐次多项式，A 取对称矩阵。化标准形就是把它对角化。"
+    def_en: "A homogeneous degree-two polynomial x^T A x with A symmetric. Reducing it to standard form is diagonalisation."
+    field: "math"
+    x: 860
+    y: 780
+    prereq: ["similar","matrix"]
+    used_by: ["positivedef"]
+  - slug: "positivedef"
+    title_zh: "正定性"
+    title_en: "Positive Definiteness"
+    def_zh: "对所有非零向量都有 x^T A x > 0。等价于全部特征值为正，也等价于各阶顺序主子式为正。"
+    def_en: "x^T A x > 0 for every nonzero x; equivalently all eigenvalues are positive, or all leading principal minors are positive."
+    field: "math"
+    x: 860
+    y: 870
+    prereq: ["quadratic"]
+    used_by: []
+  - slug: "innerprod"
+    title_zh: "内积与正交"
+    title_en: "Inner Product and Orthogonality"
+    def_zh: "内积给出长度与夹角；内积为零即正交。它是把几何直觉带进 n 维空间的工具。"
+    def_en: "The inner product supplies length and angle; zero inner product means orthogonal. It carries geometry into n dimensions."
+    field: "math"
+    x: 545
+    y: 960
+    prereq: ["lindep"]
+    used_by: ["vecspace"]
+  - slug: "vecspace"
+    title_zh: "线性空间"
+    title_en: "Linear Space"
+    def_zh: "对加法与数乘封闭、并满足八条公理的集合。它把矩阵与函数放进同一个框架。"
+    def_en: "A set closed under addition and scaling and satisfying eight axioms. It puts matrices and functions in one framework."
+    field: "math"
+    x: 700
+    y: 960
+    prereq: ["basis","lindep"]
+    used_by: ["lintransform"]
+  - slug: "coordchange"
+    title_zh: "基变换与坐标变换"
+    title_en: "Change of Basis"
+    def_zh: "两组基之间的过渡矩阵 P 把一组坐标换成另一组，同时把变换的矩阵改成 P^{-1}AP。"
+    def_en: "A transition matrix P converts coordinates between two bases and rewrites a map as P^{-1}AP."
+    field: "math"
+    x: 860
+    y: 960
+    prereq: ["vecspace","basis"]
+    used_by: []
+  - slug: "lintransform"
+    title_zh: "线性变换"
+    title_en: "Linear Transformation"
+    def_zh: "线性空间到自身的线性映射。选定基之后，它被唯一写成一个方阵。"
+    def_en: "A linear map from a space to itself. Once a basis is chosen, it is written uniquely as a square matrix."
+    field: "math"
+    x: 380
+    y: 960
+    prereq: ["linmap","vecspace"]
+    used_by: []
+  - slug: "sup"
+    title_zh: "确界原理"
+    title_en: "Supremum and Infimum"
+    def_zh: "非空有上界的实数集必有最小上界（上确界）。它是实数系连续性的第一张面孔。"
+    def_en: "Every nonempty set of reals bounded above has a least upper bound. This is the first face of completeness."
+    field: "math"
+    x: 40
+    y: 1040
+    prereq: ["analysis"]
+    used_by: ["seq","contprop","defint"]
+  - slug: "seq"
+    title_zh: "数列"
+    title_en: "Sequence"
+    def_zh: "按自然数编号的一列实数 a₁, a₂, a₃, …，本质上是 N* 到 R 的映射。"
+    def_en: "A numbered list of reals a₁, a₂, a₃, …, i.e. a map from the naturals into the reals."
+    field: "math"
+    x: 205
+    y: 1040
+    prereq: ["map"]
+    used_by: ["seql","subseq"]
+  - slug: "seql"
+    title_zh: "数列极限"
+    title_en: "Limit of a Sequence"
+    def_zh: "对任意 ε>0，存在 N，使 n>N 时 |aₙ−a|<ε。极限把“越来越接近”变成可验证的不等式。"
+    def_en: "For every ε>0 there is N such that n>N implies |aₙ−a|<ε. Limits turn “getting closer” into a testable inequality."
+    field: "math"
+    x: 380
+    y: 1040
+    prereq: ["seq","sup"]
+    used_by: ["cauchy","subseq","funclim","series"]
+  - slug: "cauchy"
+    title_zh: "Cauchy 准则"
+    title_en: "Cauchy Criterion"
+    def_zh: "数列收敛当且仅当它是基本列：从某项起任意两项都任意接近。不需要预先知道极限是谁。"
+    def_en: "A sequence converges iff it is Cauchy: eventually any two terms are arbitrarily close, no limit needed in advance."
+    field: "math"
+    x: 545
+    y: 1040
+    prereq: ["seql"]
+    used_by: ["series","unifconv"]
+  - slug: "subseq"
+    title_zh: "子列与上下极限"
+    title_en: "Subsequences and Limit Points"
+    def_zh: "子列保留原次序而跳过部分项。所有收敛子列的极限构成聚点集，最大与最小者即上、下极限。"
+    def_en: "A subsequence keeps the order and drops terms. The limits of all convergent subsequences give limsup and liminf."
+    field: "math"
+    x: 700
+    y: 1040
+    prereq: ["seql"]
+    used_by: []
+  - slug: "funclim"
+    title_zh: "函数极限"
+    title_en: "Limit of a Function"
+    def_zh: "x 趋于 x₀ 时 f(x) 趋于 A：对任意 ε>0 存在 δ>0，0<|x−x₀|<δ 时 |f(x)−A|<ε。"
+    def_en: "f(x)→A as x→x₀: for every ε>0 there is δ>0 with |f(x)−A|<ε whenever 0<|x−x₀|<δ."
+    field: "math"
+    x: 40
+    y: 1130
+    prereq: ["seql"]
+    used_by: ["cont","deriv"]
+  - slug: "cont"
+    title_zh: "连续"
+    title_en: "Continuity"
+    def_zh: "函数在一点的极限等于该点的函数值。连续把“没有断裂”写成一条可以逐点检验的等式。"
+    def_en: "The limit at a point equals the value there. Continuity turns “no break” into a pointwise equation."
+    field: "math"
+    x: 205
+    y: 1130
+    prereq: ["funclim"]
+    used_by: ["contprop","unifcont","deriv","multi"]
+  - slug: "unifcont"
+    title_zh: "一致连续"
+    title_en: "Uniform Continuity"
+    def_zh: "同一个 δ 对区间上所有点同时有效。它排除“越靠近某点越陡”的失控情形。"
+    def_en: "One δ works for every point of the interval at once, ruling out steepness that blows up near a point."
+    field: "math"
+    x: 380
+    y: 1130
+    prereq: ["cont"]
+    used_by: ["contprop","unifconv"]
+  - slug: "contprop"
+    title_zh: "闭区间连续函数性质"
+    title_en: "Properties on a Closed Interval"
+    def_zh: "闭区间上的连续函数有界、取到最大最小值、取遍中间值，并且一致连续。"
+    def_en: "A continuous function on a closed interval is bounded, attains its extrema, takes every intermediate value, and is uniformly continuous."
+    field: "math"
+    x: 545
+    y: 1130
+    prereq: ["cont","sup"]
+    used_by: ["unifcont","mvt","defint"]
+  - slug: "deriv"
+    title_zh: "导数与微分"
+    title_en: "Derivative and Differential"
+    def_zh: "差商的极限是导数；线性主部是微分。一个描述变化率，一个描述最佳线性近似。"
+    def_en: "The limit of difference quotients is the derivative; the linear main part is the differential. One is a rate, the other a best linear approximation."
+    field: "math"
+    x: 700
+    y: 1130
+    prereq: ["funclim","cont"]
+    used_by: ["mvt","indefint","partial"]
+  - slug: "mvt"
+    title_zh: "微分中值定理"
+    title_en: "Mean Value Theorem"
+    def_zh: "Rolle、Lagrange、Cauchy 三定理：导数在区间内部的某点等于整段的平均变化率。"
+    def_en: "Rolle, Lagrange, Cauchy: at some interior point the derivative equals the average rate over the interval."
+    field: "math"
+    x: 860
+    y: 1130
+    prereq: ["deriv","contprop"]
+    used_by: ["taylor","lhopital","extremum"]
+  - slug: "lhopital"
+    title_zh: "L'Hôpital 法则"
+    title_en: "L'Hôpital's Rule"
+    def_zh: "0/0 与 ∞/∞ 型极限可由导数之比的极限代替，前提是后者存在。"
+    def_en: "Limits of the form 0/0 or ∞/∞ may be replaced by the limit of the ratio of derivatives, provided that limit exists."
+    field: "math"
+    x: 40
+    y: 1220
+    prereq: ["mvt"]
+    used_by: []
+  - slug: "taylor"
+    title_zh: "Taylor 公式"
+    title_en: "Taylor's Formula"
+    def_zh: "用有限项多项式加一个余项逼近函数。余项的形式决定了近似的可靠范围。"
+    def_en: "Approximate a function by a polynomial plus a remainder. The form of the remainder fixes how far the approximation is trusted."
+    field: "math"
+    x: 205
+    y: 1220
+    prereq: ["mvt"]
+    used_by: ["extremum","powerseries","taylormv"]
+  - slug: "extremum"
+    title_zh: "极值与最值"
+    title_en: "Extrema"
+    def_zh: "局部极大极小由一阶导数为零、二阶导数定号判定；闭区间最值再比较端点。"
+    def_en: "Local extrema come from a vanishing first derivative and the sign of the second; closed-interval extrema also check endpoints."
+    field: "math"
+    x: 380
+    y: 1220
+    prereq: ["mvt","taylor"]
+    used_by: ["taylormv"]
+  - slug: "indefint"
+    title_zh: "不定积分"
+    title_en: "Indefinite Integral"
+    def_zh: "求导的逆运算：所有原函数构成一个只差常数的族。"
+    def_en: "The inverse of differentiation: all antiderivatives form a family differing by a constant."
+    field: "math"
+    x: 545
+    y: 1220
+    prereq: ["deriv"]
+    used_by: ["defint"]
+  - slug: "defint"
+    title_zh: "定积分"
+    title_en: "Definite Integral"
+    def_zh: "分割、取点、求和的极限。它把面积、位移、平均值统一成一个数。"
+    def_en: "The limit of partitions, sample points, and sums. It unifies area, displacement, and average value into one number."
+    field: "math"
+    x: 700
+    y: 1220
+    prereq: ["indefint","contprop"]
+    used_by: ["impropint","multipleint"]
+  - slug: "impropint"
+    title_zh: "反常积分"
+    title_en: "Improper Integral"
+    def_zh: "积分区间无界或被积函数无界时的积分，用极限定义，收敛与否要单独判断。"
+    def_en: "An integral over an unbounded interval or of an unbounded function, defined by a limit and judged for convergence separately."
+    field: "math"
+    x: 860
+    y: 1220
+    prereq: ["defint","seql"]
+    used_by: ["paramint"]
+  - slug: "series"
+    title_zh: "数项级数"
+    title_en: "Series of Numbers"
+    def_zh: "无穷多项之和，定义为部分和数列的极限。收敛与否只看部分和。"
+    def_en: "An infinite sum defined as the limit of partial sums. Convergence is a statement about that sequence."
+    field: "math"
+    x: 40
+    y: 1310
+    prereq: ["seql","cauchy"]
+    used_by: ["posseries","funcseries"]
+  - slug: "posseries"
+    title_zh: "正项级数"
+    title_en: "Positive Series"
+    def_zh: "各项非负的级数，部分和单调递增，因此收敛等价于部分和有界。"
+    def_en: "A series with nonnegative terms: partial sums increase, so convergence is exactly boundedness."
+    field: "math"
+    x: 205
+    y: 1310
+    prereq: ["series"]
+    used_by: ["powerseries","impropint"]
+  - slug: "funcseries"
+    title_zh: "函数项级数"
+    title_en: "Series of Functions"
+    def_zh: "每一项都是函数的级数。逐点收敛不够，真正需要的是在整个区间上同步收敛。"
+    def_en: "A series whose terms are functions. Pointwise convergence is not enough; we need convergence in step across the interval."
+    field: "math"
+    x: 380
+    y: 1310
+    prereq: ["series"]
+    used_by: ["unifconv"]
+  - slug: "unifconv"
+    title_zh: "一致收敛"
+    title_en: "Uniform Convergence"
+    def_zh: "误差上界与点无关：对任意 ε，从某项起所有点同时满足。它保证极限与积分、求导可交换。"
+    def_en: "An error bound independent of the point: from some index on, every point satisfies it at once. It licenses swapping limits with integrals and derivatives."
+    field: "math"
+    x: 545
+    y: 1310
+    prereq: ["funcseries","unifcont"]
+    used_by: ["powerseries","fourier","paramint"]
+  - slug: "powerseries"
+    title_zh: "幂级数"
+    title_en: "Power Series"
+    def_zh: "形如 Σaₙ(x−x₀)ⁿ 的级数。收敛半径把数轴切成收敛区间与发散区间两段。"
+    def_en: "A series Σaₙ(x−x₀)ⁿ. Its radius splits the line into an interval of convergence and the rest."
+    field: "math"
+    x: 700
+    y: 1310
+    prereq: ["posseries","unifconv"]
+    used_by: ["taylor"]
+  - slug: "euclid"
+    title_zh: "Euclid 空间"
+    title_en: "Euclidean Space"
+    def_zh: "Rⁿ 配上内积、距离与开球。多元极限、连续与紧性都在这个框架里说。"
+    def_en: "Rⁿ equipped with inner product, distance, and open balls. Multivariable limits, continuity, and compactness live here."
+    field: "math"
+    x: 860
+    y: 1310
+    prereq: ["cartesian","seql"]
+    used_by: ["multi","multipleint"]
+  - slug: "multi"
+    title_zh: "多元函数与连续"
+    title_en: "Functions of Several Variables"
+    def_zh: "定义域落在 Rⁿ 上的函数。极限必须沿所有路径同时成立，这是与一元最关键的差别。"
+    def_en: "A function defined on a subset of Rⁿ. Limits must hold along every path at once — the key difference from one variable."
+    field: "math"
+    x: 40
+    y: 1400
+    prereq: ["euclid","cont"]
+    used_by: ["partial","multipleint"]
+  - slug: "partial"
+    title_zh: "偏导数与全微分"
+    title_en: "Partial Derivatives and Total Differential"
+    def_zh: "偏导数固定其余变量对单个变量求导；全微分要求存在统一的线性近似，比偏导存在更强。"
+    def_en: "A partial derivative differentiates in one variable with the others frozen; the total differential demands one linear approximation for all directions."
+    field: "math"
+    x: 205
+    y: 1400
+    prereq: ["multi","deriv"]
+    used_by: ["taylormv","implicit","lineint"]
+  - slug: "taylormv"
+    title_zh: "多元 Taylor 公式"
+    title_en: "Multivariable Taylor Formula"
+    def_zh: "用梯度与 Hessian 矩阵写出多元函数的二阶展开，是判断极值的核心工具。"
+    def_en: "Expand a multivariable function to second order with gradient and Hessian; the key tool for classifying extrema."
+    field: "math"
+    x: 380
+    y: 1400
+    prereq: ["taylor","partial"]
+    used_by: ["extremum-mv"]
+  - slug: "extremum-mv"
+    title_zh: "多元极值"
+    title_en: "Extrema in Several Variables"
+    def_zh: "驻点由梯度为零给出，类型由 Hessian 的正负定性决定；边界情形另需处理。"
+    def_en: "Critical points solve ∇f = 0; the Hessian's definiteness classifies them. Boundaries need separate treatment."
+    field: "math"
+    x: 545
+    y: 1400
+    prereq: ["taylormv","extremum"]
+    used_by: ["implicit"]
+  - slug: "implicit"
+    title_zh: "隐函数与条件极值"
+    title_en: "Implicit Functions and Constrained Extrema"
+    def_zh: "由一个方程 F(x,y)=0 解出 y=y(x)，条件是偏导不为零；条件极值用 Lagrange 乘子化为方程组。"
+    def_en: "Solve F(x,y)=0 for y=y(x) when a partial derivative is nonzero; constrained extrema become equations via Lagrange multipliers."
+    field: "math"
+    x: 700
+    y: 1400
+    prereq: ["partial"]
+    used_by: []
+  - slug: "multipleint"
+    title_zh: "重积分"
+    title_en: "Multiple Integrals"
+    def_zh: "在平面或空间区域上的积分，用分割求和的极限定义，靠累次积分与换元实际计算。"
+    def_en: "Integrals over planar or spatial regions, defined by partition sums and computed via iterated integrals and change of variables."
+    field: "math"
+    x: 860
+    y: 1400
+    prereq: ["defint","multi"]
+    used_by: ["lineint"]
+  - slug: "lineint"
+    title_zh: "曲线与曲面积分"
+    title_en: "Line and Surface Integrals"
+    def_zh: "沿曲线或在曲面上对函数或向量场积分，分成第一类（对弧长、面积）与第二类（对坐标）。"
+    def_en: "Integrals along curves or over surfaces, split into first kind (arc length, area) and second kind (coordinates)."
+    field: "math"
+    x: 40
+    y: 1490
+    prereq: ["multipleint","partial"]
+    used_by: ["field"]
+  - slug: "field"
+    title_zh: "场论三大公式"
+    title_en: "Green, Gauss, and Stokes"
+    def_zh: "Green、Gauss、Stokes 公式把边界上的积分换成内部的积分，是同一件事的三次改写。"
+    def_en: "Green, Gauss, and Stokes convert boundary integrals into interior ones — three rewritings of one idea."
+    field: "math"
+    x: 205
+    y: 1490
+    prereq: ["lineint"]
+    used_by: []
+  - slug: "paramint"
+    title_zh: "含参变量积分"
+    title_en: "Integrals Depending on a Parameter"
+    def_zh: "积分里带一个参数，结果是参数的函数。连续性、可导性与可积性都要一致地控制。"
+    def_en: "An integral carrying a parameter is a function of it; continuity, differentiability, and integrability need uniform control."
+    field: "math"
+    x: 380
+    y: 1490
+    prereq: ["impropint"]
+    used_by: ["fourier"]
+  - slug: "fourier"
+    title_zh: "Fourier 级数"
+    title_en: "Fourier Series"
+    def_zh: "用正弦与余弦的叠加表示周期函数，系数由积分给出，收敛性依赖分段光滑程度。"
+    def_en: "Represent a periodic function as a superposition of sines and cosines, with coefficients given by integrals."
+    field: "math"
+    x: 545
+    y: 1490
+    prereq: ["unifconv","paramint"]
+    used_by: []
+
+  - slug: "diffeq"
+    title_zh: "微分方程"
+    title_en: "Differential Equations"
+    def_zh: "含未知函数及其导数的方程；解是一个函数族，初值条件把它挑成一条。"
+    def_en: "An equation in an unknown function and its derivatives; its solutions form a family, and an initial condition picks one out."
+    field: "math"
+    x: 40
+    y: 1560
+    prereq: ["calc"]
+    used_by: []
+  - slug: "vectorgeo"
+    title_zh: "向量代数与空间解析几何"
+    title_en: "Vector Algebra and Analytic Geometry"
+    def_zh: "用向量与坐标描述空间中的直线、平面与曲面，把几何问题化成代数方程。"
+    def_en: "Vectors and coordinates describe lines, planes, and surfaces in space, turning geometry into algebra."
+    field: "math"
+    x: 205
+    y: 1560
+    prereq: ["calc"]
+    used_by: []
+  - slug: "areavol"
+    title_zh: "定积分的应用"
+    title_en: "Applications of Definite Integrals"
+    def_zh: "把面积、体积、弧长与物理量统一写成定积分：先切分，再求和，最后取极限。"
+    def_en: "Area, volume, arc length, and physical quantities all become definite integrals: slice, sum, then take the limit."
+    field: "math"
+    x: 370
+    y: 1560
+    prereq: ["defint"]
+    used_by: []
+  - slug: "randvar"
+    title_zh: "随机变量"
+    title_en: "Random Variables"
+    def_zh: "把样本空间映射到实数的函数；分布函数 F(x)=P(X≤x) 完整描述它。"
+    def_en: "A function from the sample space to the reals; its distribution function F(x)=P(X≤x) describes it completely."
+    field: "math"
+    x: 535
+    y: 1560
+    prereq: ["calc"]
+    used_by: []
+  - slug: "distribution"
+    title_zh: "常见分布"
+    title_en: "Common Distributions"
+    def_zh: "二项、泊松、均匀、指数与正态：各有明确的试验背景与参数含义。"
+    def_en: "Binomial, Poisson, uniform, exponential, and normal: each has a clear experimental origin and parameter meaning."
+    field: "math"
+    x: 700
+    y: 1560
+    prereq: ["randvar"]
+    used_by: []
+  - slug: "jointdist"
+    title_zh: "多维随机变量"
+    title_en: "Joint Distributions"
+    def_zh: "联合分布刻画两个或多个随机变量的同时取值，边缘分布与条件分布由它派生。"
+    def_en: "The joint distribution describes several random variables together; marginals and conditionals are derived from it."
+    field: "math"
+    x: 865
+    y: 1560
+    prereq: ["randvar"]
+    used_by: []
+  - slug: "expectation"
+    title_zh: "数学期望"
+    title_en: "Expectation"
+    def_zh: "按概率加权的平均值；线性性使它可以逐项拆开计算。"
+    def_en: "A probability-weighted average; linearity lets it be split term by term."
+    field: "math"
+    x: 40
+    y: 1674
+    prereq: ["randvar"]
+    used_by: []
+  - slug: "variance"
+    title_zh: "方差"
+    title_en: "Variance"
+    def_zh: "偏离期望的平方的期望，衡量离散程度；Var(X)=E(X²)−[E(X)]²。"
+    def_en: "The expected squared deviation from the mean; Var(X)=E(X²)−[E(X)]² measures spread."
+    field: "math"
+    x: 205
+    y: 1674
+    prereq: ["expectation"]
+    used_by: []
+  - slug: "clt"
+    title_zh: "大数定律与中心极限定理"
+    title_en: "Law of Large Numbers and CLT"
+    def_zh: "样本均值依概率收敛到期望；标准化后趋于标准正态，这是统计推断的支点。"
+    def_en: "Sample means converge to the expectation, and standardized sums approach the standard normal — the pivot of inference."
+    field: "math"
+    x: 370
+    y: 1674
+    prereq: ["expectation"]
+    used_by: []
+  - slug: "sampling"
+    title_zh: "样本与抽样分布"
+    title_en: "Samples and Sampling Distributions"
+    def_zh: "从总体抽出的独立同分布样本；统计量的分布（χ²、t、F）决定推断的形式。"
+    def_en: "Independent identically distributed draws from a population; the distributions of statistics (χ², t, F) fix the form of inference."
+    field: "math"
+    x: 535
+    y: 1674
+    prereq: ["clt"]
+    used_by: []
+  - slug: "estimation"
+    title_zh: "参数估计"
+    title_en: "Parameter Estimation"
+    def_zh: "用样本构造估计量：矩估计与最大似然给出点估计，置信区间给出范围。"
+    def_en: "Build estimators from samples: moments and maximum likelihood give point estimates, confidence intervals give ranges."
+    field: "math"
+    x: 700
+    y: 1674
+    prereq: ["sampling"]
+    used_by: []
+  - slug: "hypothesistest"
+    title_zh: "假设检验"
+    title_en: "Hypothesis Testing"
+    def_zh: "先设原假设，再控制犯第一类错误的概率，用检验统计量决定是否拒绝。"
+    def_en: "Set a null hypothesis, bound the type-I error probability, and use a test statistic to decide whether to reject."
+    field: "math"
+    x: 865
+    y: 1674
+    prereq: ["estimation"]
+    used_by: []
+  - slug: "regression"
+    title_zh: "回归分析"
+    title_en: "Regression Analysis"
+    def_zh: "用最小二乘拟合变量之间的关系，并对系数与模型做显著性检验。"
+    def_en: "Fit relationships by least squares, then test coefficients and the model for significance."
+    field: "math"
+    x: 40
+    y: 1788
+    prereq: ["estimation"]
+    used_by: []
+  - slug: "markov"
+    title_zh: "马尔可夫链"
+    title_en: "Markov Chains"
+    def_zh: "状态只依赖当前值的随机过程；转移矩阵的长期行为由平稳分布刻画。"
+    def_en: "A process whose next state depends only on the present; the long-run behaviour is captured by a stationary distribution."
+    field: "math"
+    x: 205
+    y: 1788
+    prereq: ["randvar"]
+    used_by: []
+  - slug: "timeseries"
+    title_zh: "时间序列分析"
+    title_en: "Time Series Analysis"
+    def_zh: "按时间排序的观测序列；用自相关与差分把它化成可建模的平稳序列。"
+    def_en: "Observations ordered in time; autocorrelation and differencing turn them into a stationary series you can model."
+    field: "math"
+    x: 370
+    y: 1788
+    prereq: ["regression"]
+    used_by: []
+  - slug: "proplogic"
+    title_zh: "命题逻辑"
+    title_en: "Propositional Logic"
+    def_zh: "命题用联结词组合，真值表定义语义，等值演算与范式给出判定方法。"
+    def_en: "Propositions combine through connectives; truth tables fix the semantics, and equivalences plus normal forms give decision procedures."
+    field: "math"
+    x: 535
+    y: 1788
+    prereq: ["disc"]
+    used_by: []
+  - slug: "predlogic"
+    title_zh: "谓词逻辑"
+    title_en: "Predicate Logic"
+    def_zh: "引入个体、谓词与量词，把“所有”“存在”写成可推理的形式。"
+    def_en: "Individuals, predicates, and quantifiers make «all» and «exists» into formulas you can reason with."
+    field: "math"
+    x: 700
+    y: 1788
+    prereq: ["proplogic"]
+    used_by: []
+  - slug: "axiomset"
+    title_zh: "集合论的公理系统"
+    title_en: "Axiomatic Set Theory"
+    def_zh: "用公理约束集合的生成方式，避免罗素悖论这类自指构造。"
+    def_en: "Axioms constrain how sets may be formed, avoiding self-referential constructions such as Russell's paradox."
+    field: "math"
+    x: 865
+    y: 1788
+    prereq: ["set"]
+    used_by: []
+  - slug: "relation"
+    title_zh: "关系"
+    title_en: "Relations"
+    def_zh: "有序对的集合；自反、对称、传递等性质决定它是等价关系还是偏序。"
+    def_en: "A set of ordered pairs; reflexivity, symmetry, and transitivity decide whether it is an equivalence or a partial order."
+    field: "math"
+    x: 40
+    y: 1902
+    prereq: ["cartesian"]
+    used_by: []
+  - slug: "ordinal"
+    title_zh: "序数与基数"
+    title_en: "Ordinals and Cardinals"
+    def_zh: "基数衡量集合的大小，序数衡量良序集的排列长度；无限也有层次。"
+    def_en: "Cardinals measure size, ordinals measure the length of well-orders; infinity itself comes in levels."
+    field: "math"
+    x: 205
+    y: 1902
+    prereq: ["countable"]
+    used_by: []
+  - slug: "axchoice"
+    title_zh: "选择公理"
+    title_en: "Axiom of Choice"
+    def_zh: "断言任意非空集族都有选择函数；它等价于 Zorn 引理与良序定理。"
+    def_en: "Every family of non-empty sets has a choice function; equivalent to Zorn's lemma and the well-ordering theorem."
+    field: "math"
+    x: 370
+    y: 1902
+    prereq: ["axiomset"]
+    used_by: []
+  - slug: "counting"
+    title_zh: "计数原理与技术"
+    title_en: "Counting Principles"
+    def_zh: "加法与乘法原理是骨架，排列组合、容斥与递推是常用技术。"
+    def_en: "Addition and multiplication are the skeleton; permutations, inclusion–exclusion, and recurrences are the techniques."
+    field: "math"
+    x: 535
+    y: 1902
+    prereq: ["disc"]
+    used_by: []
+  - slug: "discprob"
+    title_zh: "离散概率"
+    title_en: "Discrete Probability"
+    def_zh: "在有限样本空间上按计数定义概率，条件概率与独立性引出 Bayes 公式。"
+    def_en: "On a finite sample space probability is counting; conditional probability and independence lead to Bayes' formula."
+    field: "math"
+    x: 700
+    y: 1902
+    prereq: ["counting"]
+    used_by: []
+  - slug: "divisibility"
+    title_zh: "整数与整除"
+    title_en: "Integers and Divisibility"
+    def_zh: "带余除法是起点，最大公因子与算术基本定理刻画整数的乘法结构。"
+    def_en: "Division with remainder is the start; gcd and the fundamental theorem of arithmetic describe multiplicative structure."
+    field: "math"
+    x: 865
+    y: 1902
+    prereq: ["disc"]
+    used_by: []
+  - slug: "numalg"
+    title_zh: "整数与算法"
+    title_en: "Integers and Algorithms"
+    def_zh: "Euclid 算法、扩展 Euclid 与中国剩余定理把数论结论变成可执行步骤。"
+    def_en: "The Euclidean algorithm, its extension, and the Chinese remainder theorem turn number theory into executable steps."
+    field: "math"
+    x: 40
+    y: 2016
+    prereq: ["divisibility"]
+    used_by: []
+  - slug: "algebra-struct"
+    title_zh: "代数结构"
+    title_en: "Algebraic Structures"
+    def_zh: "集合加上运算与公理：半群、群、环、域是按约束强弱排成的一列。"
+    def_en: "A set with operations and axioms: semigroups, groups, rings, and fields form a ladder of increasing constraint."
+    field: "math"
+    x: 205
+    y: 2016
+    prereq: ["disc"]
+    used_by: []
+  - slug: "group"
+    title_zh: "群"
+    title_en: "Groups"
+    def_zh: "满足封闭、结合、单位元与逆元的代数结构；子群与同态刻画其形状。"
+    def_en: "Closed, associative, with identity and inverses; subgroups and homomorphisms describe its shape."
+    field: "math"
+    x: 370
+    y: 2016
+    prereq: ["algebra-struct"]
+    used_by: []
+  - slug: "ringfield"
+    title_zh: "环与域"
+    title_en: "Rings and Fields"
+    def_zh: "环有两种运算，域再要求非零元可逆；整数环与模 p 域是最基本的例子。"
+    def_en: "Rings carry two operations; fields additionally make non-zero elements invertible. Integers and Z_p are the basic examples."
+    field: "math"
+    x: 535
+    y: 2016
+    prereq: ["group"]
+    used_by: []
+  - slug: "boolean"
+    title_zh: "布尔代数"
+    title_en: "Boolean Algebra"
+    def_zh: "有补分配格；命题逻辑与开关电路是它的两个化身。"
+    def_en: "A complemented distributive lattice; propositional logic and switching circuits are its two faces."
+    field: "math"
+    x: 700
+    y: 2016
+    prereq: ["algebra-struct"]
+    used_by: []
+  - slug: "graph"
+    title_zh: "图"
+    title_en: "Graphs"
+    def_zh: "顶点与边的集合；邻接矩阵与关联矩阵把图变成可计算的代数对象。"
+    def_en: "Vertices and edges; adjacency and incidence matrices turn a graph into a computable algebraic object."
+    field: "math"
+    x: 865
+    y: 2016
+    prereq: ["disc"]
+    used_by: []
+  - slug: "specialgraph"
+    title_zh: "重要图类"
+    title_en: "Important Graph Classes"
+    def_zh: "树、欧拉图、哈密顿图、平面图与二部图：各自有判定条件与经典定理。"
+    def_en: "Trees, Eulerian, Hamiltonian, planar, and bipartite graphs, each with its own criteria and classical theorems."
+    field: "math"
+    x: 40
+    y: 2130
+    prereq: ["graph"]
+    used_by: []
+  - slug: "hypergraph"
+    title_zh: "超图"
+    title_en: "Hypergraphs"
+    def_zh: "边可以连接任意多个顶点；它把“多元关系”写成可分析的组合结构。"
+    def_en: "An edge may join any number of vertices, encoding multi-way relations as an analysable combinatorial structure."
+    field: "math"
+    x: 205
+    y: 2130
+    prereq: ["graph"]
+    used_by: []
+  - slug: "complexity"
+    title_zh: "算法复杂度"
+    title_en: "Algorithmic Complexity"
+    def_zh: "用增长阶衡量时间与空间，O、Ω、Θ 描述最坏、最好与平均情形。"
+    def_en: "Growth order measures time and space; O, Ω, and Θ describe worst, best, and average cases."
+    field: "cs"
+    x: 370
+    y: 2130
+    prereq: ["disc"]
+    used_by: []
+  - slug: "list"
+    title_zh: "线性表"
+    title_en: "Linear Lists"
+    def_zh: "有限个同类型元素的有序序列；顺序存储与链式存储是两种基本实现。"
+    def_en: "A finite ordered sequence of elements; sequential and linked storage are the two basic implementations."
+    field: "cs"
+    x: 535
+    y: 2130
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "stack"
+    title_zh: "栈"
+    title_en: "Stacks"
+    def_zh: "后进先出的线性表；递归、表达式求值与括号匹配都靠它。"
+    def_en: "A last-in-first-out list; recursion, expression evaluation, and bracket matching all rely on it."
+    field: "cs"
+    x: 700
+    y: 2130
+    prereq: ["list"]
+    used_by: []
+  - slug: "queue"
+    title_zh: "队列"
+    title_en: "Queues"
+    def_zh: "先进先出的线性表；循环队列与链队列解决假溢出与动态增长。"
+    def_en: "A first-in-first-out list; circular and linked queues solve false overflow and dynamic growth."
+    field: "cs"
+    x: 865
+    y: 2130
+    prereq: ["list"]
+    used_by: []
+  - slug: "stringds"
+    title_zh: "串"
+    title_en: "Strings"
+    def_zh: "字符的有限序列；模式匹配把朴素比较改进到 KMP 的线性时间。"
+    def_en: "A finite sequence of characters; pattern matching improves from naive comparison to linear-time KMP."
+    field: "cs"
+    x: 40
+    y: 2244
+    prereq: ["list"]
+    used_by: []
+  - slug: "arraygen"
+    title_zh: "数组与广义表"
+    title_en: "Arrays and Generalized Lists"
+    def_zh: "多维数组的存储映射与稀疏压缩；广义表允许元素本身是表。"
+    def_en: "Storage mappings for multidimensional arrays and sparse compression; a generalized list may contain lists as elements."
+    field: "cs"
+    x: 205
+    y: 2244
+    prereq: ["list"]
+    used_by: []
+  - slug: "tree"
+    title_zh: "树"
+    title_en: "Trees"
+    def_zh: "无回路的连通结构；遍历、存储与并查集把层次关系变成算法。"
+    def_en: "A connected acyclic structure; traversal, storage, and union-find turn hierarchies into algorithms."
+    field: "cs"
+    x: 370
+    y: 2244
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "binarytree"
+    title_zh: "二叉树"
+    title_en: "Binary Trees"
+    def_zh: "每个结点至多两个孩子；前中后序与线索化给出不同的访问顺序。"
+    def_en: "At most two children per node; pre-, in-, and post-order plus threading give different visiting orders."
+    field: "cs"
+    x: 535
+    y: 2244
+    prereq: ["tree"]
+    used_by: []
+  - slug: "graphds"
+    title_zh: "图的存储与遍历"
+    title_en: "Graph Storage and Traversal"
+    def_zh: "邻接矩阵与邻接表各有取舍；DFS 与 BFS 决定访问顺序与复杂度。"
+    def_en: "Adjacency matrices and lists trade off differently; DFS and BFS fix visiting order and cost."
+    field: "cs"
+    x: 700
+    y: 2244
+    prereq: ["graph"]
+    used_by: []
+  - slug: "dynstorage"
+    title_zh: "动态存储管理"
+    title_en: "Dynamic Storage Management"
+    def_zh: "堆的分配与回收；边界标识、伙伴系统与无用单元收集负责碎片。"
+    def_en: "Allocation and reclamation on the heap; boundary tags, buddy systems, and garbage collection handle fragmentation."
+    field: "cs"
+    x: 865
+    y: 2244
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "search"
+    title_zh: "查找"
+    title_en: "Searching"
+    def_zh: "顺序、折半、二叉排序树、平衡树与 B 树；散列表把平均查找降到常数。"
+    def_en: "Sequential, binary, BST, balanced trees, and B-trees; hashing brings average search down to constant time."
+    field: "cs"
+    x: 40
+    y: 2358
+    prereq: ["binarytree"]
+    used_by: []
+  - slug: "sorting"
+    title_zh: "内部排序"
+    title_en: "Internal Sorting"
+    def_zh: "插入、交换、选择、归并与基数排序：比较次数、移动次数与稳定性各不相同。"
+    def_en: "Insertion, exchange, selection, merge, and radix sorts differ in comparisons, moves, and stability."
+    field: "cs"
+    x: 205
+    y: 2358
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "extsort"
+    title_zh: "外部排序"
+    title_en: "External Sorting"
+    def_zh: "数据大于内存时用多路归并与置换选择，I/O 次数成为主要成本。"
+    def_en: "When data exceeds memory, multiway merging and replacement selection make I/O count the dominant cost."
+    field: "cs"
+    x: 370
+    y: 2358
+    prereq: ["sorting"]
+    used_by: []
+  - slug: "filedata"
+    title_zh: "文件"
+    title_en: "Files"
+    def_zh: "记录的集合与组织方式；顺序、索引与散列文件对应不同的访问模式。"
+    def_en: "Collections of records and their organization; sequential, indexed, and hashed files suit different access patterns."
+    field: "cs"
+    x: 535
+    y: 2358
+    prereq: ["search"]
+    used_by: []
+  - slug: "bus"
+    title_zh: "系统总线"
+    title_en: "System Bus"
+    def_zh: "连接 CPU、主存与 I/O 的公共通路；按功能分为数据、地址与控制总线。"
+    def_en: "The shared path linking CPU, memory, and I/O; functionally split into data, address, and control buses."
+    field: "cs"
+    x: 700
+    y: 2358
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "memhier"
+    title_zh: "存储器层次"
+    title_en: "Memory Hierarchy"
+    def_zh: "寄存器—Cache—主存—辅存按速度与容量分层，局部性原理使分层有效。"
+    def_en: "Registers, cache, main memory, and secondary storage form layers by speed and size; locality makes the hierarchy work."
+    field: "cs"
+    x: 865
+    y: 2358
+    prereq: ["bus"]
+    used_by: []
+  - slug: "cache"
+    title_zh: "高速缓存"
+    title_en: "Cache"
+    def_zh: "把主存块复制到靠近 CPU 的小容量存储器；地址映射与替换策略决定命中率。"
+    def_en: "Copies blocks of main memory close to the CPU; mapping and replacement policies determine the hit rate."
+    field: "cs"
+    x: 40
+    y: 2472
+    prereq: ["memhier"]
+    used_by: []
+  - slug: "iosys"
+    title_zh: "输入输出系统"
+    title_en: "I/O Systems"
+    def_zh: "设备、接口与总线协同完成数据传送；查询、中断与 DMA 是三种基本方式。"
+    def_en: "Devices, interfaces, and buses cooperate to move data; polling, interrupts, and DMA are the three basic modes."
+    field: "cs"
+    x: 205
+    y: 2472
+    prereq: ["bus"]
+    used_by: []
+  - slug: "interrupt"
+    title_zh: "中断"
+    title_en: "Interrupts"
+    def_zh: "设备或异常打断当前程序，保存现场后转入服务程序，返回时恢复。"
+    def_en: "A device or exception suspends the running program, saves context, runs a handler, and restores on return."
+    field: "cs"
+    x: 370
+    y: 2472
+    prereq: ["iosys"]
+    used_by: []
+  - slug: "dma"
+    title_zh: "DMA"
+    title_en: "Direct Memory Access"
+    def_zh: "由 DMA 控制器直接在设备与主存之间搬运数据，CPU 只在开始与结束时介入。"
+    def_en: "A DMA controller moves data between device and memory directly; the CPU intervenes only at the start and end."
+    field: "cs"
+    x: 535
+    y: 2472
+    prereq: ["iosys"]
+    used_by: []
+  - slug: "alu"
+    title_zh: "运算方法与运算器"
+    title_en: "Computer Arithmetic and ALU"
+    def_zh: "定点与浮点的加减乘除都化成移位与加法；ALU 是执行这些操作的部件。"
+    def_en: "Fixed- and floating-point arithmetic reduce to shifts and additions; the ALU executes them."
+    field: "cs"
+    x: 700
+    y: 2472
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "floatrepr"
+    title_zh: "浮点表示"
+    title_en: "Floating-Point Representation"
+    def_zh: "阶码与尾数共同表示实数；IEEE 754 规定格式、舍入与特殊值。"
+    def_en: "Exponent and significand represent reals; IEEE 754 fixes formats, rounding, and special values."
+    field: "cs"
+    x: 865
+    y: 2472
+    prereq: ["alu"]
+    used_by: []
+  - slug: "isa"
+    title_zh: "指令系统"
+    title_en: "Instruction Set Architecture"
+    def_zh: "机器指令的格式、寻址方式与操作类型，是软件与硬件的契约。"
+    def_en: "Instruction formats, addressing modes, and operation types form the contract between software and hardware."
+    field: "cs"
+    x: 40
+    y: 2586
+    prereq: ["alu"]
+    used_by: []
+  - slug: "cpustruct"
+    title_zh: "CPU 结构"
+    title_en: "CPU Structure"
+    def_zh: "寄存器、ALU 与数据通路组成 CPU；指令周期把它串成取指、间址、执行、中断。"
+    def_en: "Registers, ALU, and datapaths form the CPU; the instruction cycle strings them into fetch, indirect, execute, interrupt."
+    field: "cs"
+    x: 205
+    y: 2586
+    prereq: ["isa"]
+    used_by: []
+  - slug: "pipeline"
+    title_zh: "指令流水"
+    title_en: "Instruction Pipelining"
+    def_zh: "把指令执行切成若干段重叠进行；冒险与相关决定加速比的上限。"
+    def_en: "Split execution into stages that overlap; hazards bound the achievable speedup."
+    field: "cs"
+    x: 370
+    y: 2586
+    prereq: ["cpustruct"]
+    used_by: []
+  - slug: "controlunit"
+    title_zh: "控制单元"
+    title_en: "Control Unit"
+    def_zh: "产生时序控制信号，指挥各部件在正确的节拍做正确的操作。"
+    def_en: "Generates timed control signals that direct each component to act correctly in each beat."
+    field: "cs"
+    x: 535
+    y: 2586
+    prereq: ["cpustruct"]
+    used_by: []
+  - slug: "microprogram"
+    title_zh: "微程序控制"
+    title_en: "Microprogrammed Control"
+    def_zh: "把一条机器指令拆成微指令序列，用控制存储器逐条取出执行。"
+    def_en: "A machine instruction becomes a sequence of microinstructions fetched from a control store."
+    field: "cs"
+    x: 700
+    y: 2586
+    prereq: ["controlunit"]
+    used_by: []
+  - slug: "osintro"
+    title_zh: "操作系统引论"
+    title_en: "Introduction to Operating Systems"
+    def_zh: "管理硬件、提供抽象、调度资源的系统软件；目标是并发、共享、虚拟与异步。"
+    def_en: "System software that manages hardware, offers abstractions, and schedules resources for concurrency, sharing, and virtuality."
+    field: "cs"
+    x: 865
+    y: 2586
+    prereq: ["complexity"]
+    used_by: []
+  - slug: "process"
+    title_zh: "进程"
+    title_en: "Processes"
+    def_zh: "程序的一次执行，是资源分配与独立运行的基本单位；由 PCB 描述。"
+    def_en: "One execution of a program, the unit of resource allocation and independent running, described by a PCB."
+    field: "cs"
+    x: 40
+    y: 2700
+    prereq: ["osintro"]
+    used_by: []
+  - slug: "thread"
+    title_zh: "线程"
+    title_en: "Threads"
+    def_zh: "进程内的执行流，共享地址空间；切换开销小于进程。"
+    def_en: "An execution stream inside a process sharing its address space; cheaper to switch than a process."
+    field: "cs"
+    x: 205
+    y: 2700
+    prereq: ["process"]
+    used_by: []
+  - slug: "sched"
+    title_zh: "处理机调度"
+    title_en: "Processor Scheduling"
+    def_zh: "在就绪队列中按策略选进程上处理机；FCFS、SJF、优先级与多级反馈队列各有取舍。"
+    def_en: "Pick a ready process for the CPU; FCFS, SJF, priority, and multilevel feedback queues trade off differently."
+    field: "cs"
+    x: 370
+    y: 2700
+    prereq: ["process"]
+    used_by: []
+  - slug: "deadlock"
+    title_zh: "死锁"
+    title_en: "Deadlock"
+    def_zh: "多个进程互相等待对方持有的资源；预防、避免、检测与解除是四条对策。"
+    def_en: "Processes wait on resources held by each other; prevention, avoidance, detection, and recovery are the four responses."
+    field: "cs"
+    x: 535
+    y: 2700
+    prereq: ["sched"]
+    used_by: []
+  - slug: "memmgmt"
+    title_zh: "存储器管理"
+    title_en: "Memory Management"
+    def_zh: "连续、分页与分段分配；地址变换与碎片处理是核心问题。"
+    def_en: "Contiguous, paged, and segmented allocation; address translation and fragmentation are the core problems."
+    field: "cs"
+    x: 700
+    y: 2700
+    prereq: ["osintro"]
+    used_by: []
+  - slug: "virtmem"
+    title_zh: "虚拟存储器"
+    title_en: "Virtual Memory"
+    def_zh: "只把当前需要的页调入内存，用页表与缺页中断制造大内存的假象。"
+    def_en: "Load only the pages in use; page tables and page faults create the illusion of a large memory."
+    field: "cs"
+    x: 865
+    y: 2700
+    prereq: ["memmgmt"]
+    used_by: []
+  - slug: "iomgmt"
+    title_zh: "设备管理"
+    title_en: "Device Management"
+    def_zh: "通过 I/O 软件层与缓冲区把设备差异隐藏起来，提高并行度。"
+    def_en: "I/O software layers and buffering hide device differences and increase parallelism."
+    field: "cs"
+    x: 40
+    y: 2814
+    prereq: ["osintro"]
+    used_by: []
+  - slug: "filesys"
+    title_zh: "文件系统"
+    title_en: "File Systems"
+    def_zh: "把磁盘块组织成目录与文件；分配方式、空闲管理与一致性决定性能与可靠。"
+    def_en: "Organize disk blocks into directories and files; allocation, free-space management, and consistency set performance and reliability."
+    field: "cs"
+    x: 205
+    y: 2814
+    prereq: ["osintro"]
+    used_by: []
+  - slug: "disksched"
+    title_zh: "磁盘调度"
+    title_en: "Disk Scheduling"
+    def_zh: "按寻道与旋转代价排序请求；FCFS、SSTF、SCAN 与 C-SCAN 各有偏斜。"
+    def_en: "Order requests by seek and rotational cost; FCFS, SSTF, SCAN, and C-SCAN skew differently."
+    field: "cs"
+    x: 370
+    y: 2814
+    prereq: ["filesys"]
+    used_by: []
+  - slug: "osif"
+    title_zh: "操作系统接口"
+    title_en: "Operating System Interfaces"
+    def_zh: "命令接口与系统调用构成用户与内核的边界；Shell 把它们串成工作流。"
+    def_en: "Command interfaces and system calls form the user–kernel boundary; the shell strings them into workflows."
+    field: "cs"
+    x: 535
+    y: 2814
+    prereq: ["osintro"]
+    used_by: []
+  - slug: "multiproc"
+    title_zh: "多处理机操作系统"
+    title_en: "Multiprocessor Operating Systems"
+    def_zh: "多个处理机共享内存；一致性与负载均衡决定扩展性。"
+    def_en: "Multiple processors share memory; coherence and load balancing determine scalability."
+    field: "cs"
+    x: 700
+    y: 2814
+    prereq: ["process"]
+    used_by: []
+  - slug: "ossecurity"
+    title_zh: "保护与安全"
+    title_en: "Protection and Security"
+    def_zh: "用访问矩阵、能力表与认证机制限制谁能对什么做什么。"
+    def_en: "Access matrices, capability lists, and authentication restrict who may do what to which object."
+    field: "cs"
+    x: 865
+    y: 2814
+    prereq: ["filesys"]
+    used_by: []

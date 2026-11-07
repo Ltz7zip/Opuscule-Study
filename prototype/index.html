@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Opuscule 学习工作台概念原型：三条轨道、知识关联、中英双语、自由跳读。">
+<title>Opuscule · 学习工作台概念原型</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f5f3ed'/%3E%3Crect x='10' y='10' width='12' height='12' fill='%23a8432a' transform='rotate(45 16 16)'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<script>
+  (function () {
+    try {
+      var t = new URLSearchParams(location.search).get('theme') || localStorage.getItem('opus.theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#/home" aria-label="Opuscule 首页">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Opuscule</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="#/home" data-nav="home">书库</a>
+      <a href="#/path/dl/mastery" data-nav="path">路线</a>
+      <a href="#/map" data-nav="map">知识图</a>
+      <a href="#/review" data-nav="review">复习</a>
+    </nav>
+    <div class="tools">
+      <button class="tool" id="langBtn" type="button" aria-label="切换界面语言">EN</button>
+      <button class="tool" id="themeBtn" type="button" aria-label="切换深浅主题">深色</button>
+    </div>
+  </div>
+</header>
+
+<div class="readbar" id="readbar" aria-hidden="true"><i></i></div>
+
+<main id="main" class="wrap" aria-live="polite"></main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>Opuscule · 概念原型</span>
+    <span class="muted">示例内容仅用于演示，尚未接入服务器与真实教材</span>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="移动端导航">
+  <a href="#/home" data-nav="home">书库</a>
+  <a href="#/path/dl/mastery" data-nav="path">路线</a>
+  <a href="#/map" data-nav="map">知识图</a>
+  <a href="#/review" data-nav="review">复习</a>
+</nav>
+
+<div id="drawerWrap" class="drawer-wrap" hidden>
+  <button class="drawer-backdrop" id="drawerBackdrop" type="button" aria-label="关闭详情"></button>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle"></aside>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

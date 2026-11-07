@@ -1,0 +1,25 @@
+# macOS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+npm-debug.log*
+*.log
+
+# Build output
+site/dist/
+
+# Local caches / tooling
+.screenshots/
+.trae-html-share-packages/
+
+# 教材原始资料（约 13GB，不适合入仓）
+资料/
