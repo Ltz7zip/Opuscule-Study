@@ -42,6 +42,12 @@ HEADING_RE = re.compile(r'^##\s+(.+?)\s*$', re.M)
 MATH_RE = re.compile(r'\$\$(.+?)\$\$|(?<![\\$])\$(?!\$)(.+?)(?<![\\$])\$', re.S)
 MATH_TOKEN = 'OPUSMATH{}X'
 ALERT_RE = re.compile(r'^>\s*\[!(NOTE|MYTH|PRACTICE|ANSWER|FORMAL)\]\s*(.*)$')
+# 代码块与行内代码里的 $ * 都不参与公式 / 强调解析，例如 `df$height`、`mean(x)`
+CODE_RE = re.compile(r'```.*?```|`[^`\n]*`', re.S)
+# 小节标题在前端按纯文本渲染（导航、搜索复用），只保留公式内容，去掉 $ 定界符
+TITLE_MATH_RE = re.compile(r'\$+([^$\n]+)\$+')
+# 成对的 ** 换成 <strong>，代码里的星号不动
+EMPHASIS_RE = re.compile(r'\*\*(.+?)\*\*')
 
 ALERT_TEMPLATES = {
     'NOTE': '<aside class="callout">{body}</aside>',
@@ -50,6 +56,18 @@ ALERT_TEMPLATES = {
     'ANSWER': '<details class="answer"><summary>{title}</summary>{body}</details>',
     'FORMAL': '<details class="formal"><summary>{title}</summary>{body}</details>',
 }
+
+
+def map_outside_code(text: str, transform) -> str:
+    """代码块和行内代码原样保留，其余片段交给 transform 处理。"""
+    parts: list[str] = []
+    last = 0
+    for match in CODE_RE.finditer(text):
+        parts.append(transform(text[last:match.start()]))
+        parts.append(match.group(0))
+        last = match.end()
+    parts.append(transform(text[last:]))
+    return ''.join(parts)
 
 
 def protect_math(raw: str) -> tuple[str, list[tuple[bool, str]]]:
@@ -62,7 +80,8 @@ def protect_math(raw: str) -> tuple[str, list[tuple[bool, str]]]:
         formulas.append((display, tex))
         return MATH_TOKEN.format(len(formulas) - 1)
 
-    return MATH_RE.sub(replace, raw), formulas
+    # 代码里的 $ 不是公式定界符，否则 `df$height` 会把后面整段正文吞进公式
+    return map_outside_code(raw, lambda segment: MATH_RE.sub(replace, segment)), formulas
 
 
 def restore_math(markup: str, formulas: list[tuple[bool, str]]) -> str:
@@ -70,14 +89,37 @@ def restore_math(markup: str, formulas: list[tuple[bool, str]]) -> str:
     for index, (display, tex) in enumerate(formulas):
         attr = html.escape(tex, quote=True)
         token = MATH_TOKEN.format(index)
-        if display:
-            node = f'<div class="math-display" data-tex="{attr}">{attr}</div>'
-            # 独占一行的公式会被 markdown 包进 <p>，整段替换掉，避免块级元素嵌在段落里
-            markup = markup.replace(f'<p>{token}</p>', node)
-        else:
+        if not display:
             node = f'<span class="math-inline" data-tex="{attr}">{attr}</span>'
+            markup = markup.replace(token, node)
+            continue
+        node = f'<div class="math-display" data-tex="{attr}">{attr}</div>'
+        # 块级公式不能留在 <p> 里，把所在段落切成前后两段
+        markup = re.sub(
+            rf'<p>((?:(?!</p>).)*?){token}((?:(?!</p>).)*?)</p>',
+            lambda m: ''.join([
+                f'<p>{m.group(1).strip()}</p>' if m.group(1).strip() else '',
+                node,
+                f'<p>{m.group(2).strip()}</p>' if m.group(2).strip() else '',
+            ]),
+            markup,
+            flags=re.S,
+        )
         markup = markup.replace(token, node)
     return markup
+
+
+def fix_emphasis(text: str) -> str:
+    """把成对的 ** 直接写成 <strong> 标签。
+
+    CommonMark 的 flanking 规则不允许开标记紧贴标点（如「以及**“趋近”**」），
+    中文正文里这种写法很常见，交给 markdown 渲染只会露出字面星号。
+    公式已在上一步换成占位符，行内代码里的星号保持原样。
+    """
+    def replace(match: re.Match) -> str:
+        return f'<strong>{match.group(1)}</strong>'
+
+    return map_outside_code(text, lambda segment: EMPHASIS_RE.sub(replace, segment))
 
 
 def wrap_tables(markup: str) -> str:
@@ -116,7 +158,9 @@ def render_markup(text: str, renderer: MarkdownIt) -> str:
             index += 1
 
         body = render_markup('\n'.join(inner).strip(), renderer)
-        parts.append(ALERT_TEMPLATES[kind].format(title=title, body=body))
+        # 标题也要过一遍行内 Markdown，否则 `pnorm` 这类行内代码会露出反引号
+        title_html = renderer.renderInline(title).strip()
+        parts.append(ALERT_TEMPLATES[kind].format(title=title_html, body=body))
 
     if buffer:
         parts.append(render_fragment('\n'.join(buffer).strip(), renderer))
@@ -144,8 +188,8 @@ def parse_sections(body: str, renderer: MarkdownIt) -> list[dict]:
             'ordinal': index + 1,
             'anchor': f'sec-{index + 1}',
             'label': f'{index + 1:02d}',
-            'title': match.group(1).strip(),
-            'html': restore_math(render_markup(protected, renderer), formulas),
+            'title': TITLE_MATH_RE.sub(r'\1', match.group(1).strip()),
+            'html': restore_math(render_markup(fix_emphasis(protected), renderer), formulas),
         })
     return sections
 

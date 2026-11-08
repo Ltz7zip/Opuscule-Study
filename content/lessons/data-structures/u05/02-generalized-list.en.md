@@ -122,7 +122,7 @@ Copying is recursive too: copy an atom directly, and for a sublist copy `hp` fir
 > > `GetHead(E)` is $(a,b)$, and its head is $a$. Taking the tail instead would give $(b)$.
 
 > [!PRACTICE] 3 · Classify
-> What are the length and depth of $F=(())\)?
+> What are the length and depth of $F=(())$?
 >
 > > [!ANSWER] Show answer
 > > The top level holds one element, the empty list, so length 1; two levels of parentheses give depth 2.
